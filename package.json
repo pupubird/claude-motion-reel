@@ -1,19 +1,31 @@
 {
   "name": "claude-motion-reel",
   "version": "1.0.0",
-  "description": "15s motion design showreel rendered from code: three.js + canvas + GLSL + WebAudio",
+  "description": "Motion reels rendered entirely from code: three.js + canvas + GLSL + WebAudio",
   "scripts": {
-    "render": "node render.mjs",
-    "stills": "node render.mjs --samples=1 --stills=100,240,400,520,600,750,850",
-    "preview": "python3 -m http.server 5173"
+    "preview": "python3 -m http.server 5173",
+    "render": "node projects/claude-reel/render.mjs",
+    "stills": "node projects/claude-reel/render.mjs --samples=1 --stills=100,240,400,520,600,750,850",
+    "aw:render": "node projects/adswinning/render.mjs --workers=3",
+    "aw:stills": "node projects/adswinning/render.mjs --samples=1 --stills=20,300,452,745,905,1040,1230,1300,1470,1690",
+    "aw:audio": "node projects/adswinning/render.mjs --audio && python3 projects/adswinning/tools/check_audio.py projects/adswinning/out/soundtrack.wav",
+    "aw:check": "python3 projects/adswinning/tools/check_frames.py projects/adswinning/out/adswinning-showreel-2026.mp4 && python3 projects/adswinning/tools/check_audio.py projects/adswinning/out/soundtrack.wav",
+    "zm:assets": "sh projects/zemyth/tools/prep_assets.sh",
+    "zm:render": "node projects/zemyth/render.mjs --samples=8 --workers=3",
+    "zm:stills": "node projects/zemyth/render.mjs --samples=1 --stills=150,300,500,820,1000,1300,1440,1700",
+    "zm:check": "python3 projects/zemyth/tools/check_frames.py projects/zemyth/out/zemyth-reel-2026.mp4 && python3 projects/zemyth/tools/check_audio.py projects/zemyth/out/soundtrack.wav"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "lucide": "^1.48.0",
     "playwright-core": "^1.63.0",
     "three": "^0.186.1"
   },

@@ -1,8 +1,8 @@
 // Frame-exact renderer: serves the project, drives headless Chrome (GPU) frame by frame,
 // pipes PNGs + the synthesised WAV into ffmpeg.
-//   node render.mjs                         full 900-frame render → out/claude-motion-reel-2026.mp4
-//   node render.mjs --stills=0,300,600      review stills → out/stills/
-//   node render.mjs --samples=2 --from=0 --to=240 --out=out/test.mp4
+//   node projects/claude-reel/render.mjs                         full 900-frame render → projects/claude-reel/out/claude-motion-reel-2026.mp4
+//   node projects/claude-reel/render.mjs --stills=0,300,600      review stills → projects/claude-reel/out/stills/
+//   node projects/claude-reel/render.mjs --samples=2 --from=0 --to=240 --out=out/test.mp4
 import { chromium } from 'playwright-core';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -12,13 +12,14 @@ import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
-const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(ROOT, 'out');
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(HERE, '../..');              // repo root: node_modules is shared
+const OUT = path.join(HERE, 'out');
 const FPS = 60, FRAMES = 900;
 const SAMPLES = Number(args.samples ?? 8);
 const from = Number(args.from ?? 0), to = Number(args.to ?? FRAMES);
 const stills = args.stills ? String(args.stills).split(',').map(Number) : null;
-const outFile = path.resolve(ROOT, args.out ?? 'out/claude-motion-reel-2026.mp4');
+const outFile = path.resolve(ROOT, args.out ?? 'projects/claude-reel/out/claude-motion-reel-2026.mp4');
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2', '.woff': 'font/woff', '.css': 'text/css' };
 const server = http.createServer((req, res) => {
@@ -28,7 +29,7 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(p).pipe(res);
 });
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const url = `http://127.0.0.1:${server.address().port}/index.html?mode=render`;
+const url = `http://127.0.0.1:${server.address().port}/projects/claude-reel/index.html?mode=render`;
 
 const browser = await chromium.launch({
   channel: 'chrome',

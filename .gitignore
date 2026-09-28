@@ -2,3 +2,11 @@ node_modules/
 out/
 .DS_Store
 ffmpeg2pass-*
+# raw AI generations (large); prep_ads.py sizes them into assets/ads/
+projects/adswinning/assets/raw/
+# Zemyth: the client's footage, photos and commercially licensed fonts are not redistributable.
+# tools/prep_assets.sh copies them from a local checkout of the Zemyth website.
+projects/zemyth/assets/footage/
+projects/zemyth/assets/img/
+projects/zemyth/assets/fonts/refinery-95-bold.ttf
+projects/zemyth/assets/fonts/BlenderPro-*.ttf

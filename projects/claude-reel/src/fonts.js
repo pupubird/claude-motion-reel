@@ -1,5 +1,5 @@
 // Load the three type families from local node_modules (served by the dev/render server).
-const FS = './node_modules/@fontsource';
+const FS = '/node_modules/@fontsource';
 const FACES = [
   ['Inter Tight', `${FS}-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2`, { weight: '100 900', style: 'normal' }],
   ['Inter Tight', `${FS}-variable/inter-tight/files/inter-tight-latin-wght-italic.woff2`, { weight: '100 900', style: 'italic' }],
