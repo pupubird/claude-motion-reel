@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude — Motion Reel 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  body { display: grid; place-items: center; font: 14px/1.4 ui-monospace, Menlo, monospace; color: #EFEAE0; }
+  canvas#out { display: block; width: min(100vw, 177.78vh); height: auto; aspect-ratio: 16 / 9; }
+  body.render canvas#out { width: 1920px; height: 1080px; }
+  #hint { position: fixed; bottom: 24px; left: 0; right: 0; text-align: center; opacity: .7; letter-spacing: .15em; }
+  body.render #hint { display: none; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<div id="hint">CLICK TO PLAY · SPACE TO PAUSE</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

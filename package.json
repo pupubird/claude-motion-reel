@@ -1,0 +1,21 @@
+{
+  "name": "claude-motion-reel",
+  "version": "1.0.0",
+  "description": "15s motion design showreel rendered from code: three.js + canvas + GLSL + WebAudio",
+  "scripts": {
+    "render": "node render.mjs",
+    "stills": "node render.mjs --samples=1 --stills=100,240,400,520,600,750,850",
+    "preview": "python3 -m http.server 5173"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "playwright-core": "^1.63.0",
+    "three": "^0.186.1"
+  },
+  "private": true
+}
