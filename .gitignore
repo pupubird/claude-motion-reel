@@ -10,3 +10,17 @@ projects/zemyth/assets/footage/
 projects/zemyth/assets/img/
 projects/zemyth/assets/fonts/refinery-95-bold.ttf
 projects/zemyth/assets/fonts/BlenderPro-*.ttf
+
+# Nova Pitch: the client's showroom deck (rasterised) and demo marks; tools/prep_assets.sh copies them from a
+# local checkout of the product repo. Take audit files and the music takes that were not used stay local too.
+projects/novapitch/assets/slides/
+projects/novapitch/assets/brand/
+projects/novapitch/assets/music/v1/
+projects/novapitch/assets/music/t*.mp3
+projects/novapitch/assets/music/t*.json
+projects/novapitch/assets/vo/answer_*.mp3
+projects/novapitch/assets/vo/answer_*.json
+
+# local secrets (never commit)
+.env
+.env.*

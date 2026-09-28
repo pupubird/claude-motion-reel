@@ -1,0 +1,202 @@
+{
+ "name": "t6",
+ "model": "music_v2",
+ "seed": 303,
+ "song_id": "mU3vLiLvmPy6wUjmHHwj",
+ "total_ms": 44000,
+ "plan": {
+  "chunks": [
+   {
+    "text": "[Intro]",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "modern cinematic electronic score",
+     "premium tech product launch film",
+     "120 BPM",
+     "4/4",
+     "glossy analog synths",
+     "wide stereo",
+     "polished modern production",
+     "dark ambient intro",
+     "deep sub-bass drone only",
+     "a soft clock-like tick on every beat",
+     "one lonely distant synth pluck",
+     "vast empty space",
+     "quiet tension",
+     "nearly silent by the last beat"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "choir",
+     "spoken word",
+     "lyrics",
+     "guitar",
+     "orchestral trailer braams",
+     "dubstep wobble",
+     "festival EDM supersaw drop",
+     "lo-fi",
+     "corporate ukulele",
+     "cheesy",
+     "chiptune",
+     "drums",
+     "kick drum",
+     "snare",
+     "hi-hats",
+     "percussion groove",
+     "bass line",
+     "loud"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Drop]\n{massive impact hit exactly on the first beat}",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "huge cinematic impact on beat one",
+     "punchy drums enter on beat one",
+     "pulsing sixteenth-note synth bass",
+     "bright shimmering synth swell",
+     "uplifting burst of energy"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "fade in",
+     "quiet start",
+     "ambient"
+    ],
+    "context_adherence": "low"
+   },
+   {
+    "text": "[Groove]",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "driving four-on-the-floor groove",
+     "crisp closed hi-hats",
+     "sparkling synth arpeggio",
+     "forward momentum",
+     "clever and precise"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Build]\n{snare roll accelerating into the next downbeat}",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "rising build",
+     "accelerating snare roll",
+     "white-noise riser",
+     "filter sweep opening"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "breakdown",
+     "silence"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Verse]",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "lighter bouncy groove",
+     "muted plucked synths",
+     "filtered drums",
+     "space in the midrange for a speaking voice",
+     "warm, human, playful"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "loud lead synth",
+     "busy melody"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "[Peak]",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "peak energy",
+     "full drums with claps",
+     "big sub bass",
+     "euphoric wide synth chords",
+     "driving and triumphant"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "quiet",
+     "breakdown"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "[Breakdown]\n{reverse swell sucking into the next downbeat}",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "breakdown",
+     "all drums drop out",
+     "warm evolving pads",
+     "soft reversed swells",
+     "emotional and hopeful"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "kick drum",
+     "drums",
+     "hi-hats",
+     "snare"
+    ],
+    "context_adherence": "low"
+   },
+   {
+    "text": "[Finale]\n{massive final hit on the first beat, then a long ringing tail}",
+    "duration_ms": 8000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "massive final impact on beat one",
+     "triumphant sustained major chord",
+     "sparkling shimmer",
+     "gentle pulsing outro",
+     "decays to silence by the end"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "abrupt cut",
+     "new groove"
+    ],
+    "context_adherence": "medium"
+   }
+  ]
+ }
+}
