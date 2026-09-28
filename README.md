@@ -5,8 +5,7 @@ three.js, Canvas 2D, hand-written GLSL, and a Web Audio soundtrack. There's no f
 
 It was designed and built by Claude (Anthropic's model) in a single [Claude Code](https://claude.com/claude-code) session.
 
-<!-- VIDEO: GitHub renders a user-attachments video URL on its own line as an inline player. -->
-VIDEO_URL_PLACEHOLDER
+https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 
 [![Poster frame](docs/poster.jpg)](../../releases/latest)
 
