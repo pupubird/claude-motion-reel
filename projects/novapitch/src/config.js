@@ -8,9 +8,9 @@ export const FPS = 60;
 export const BPM = 120;
 export const BEAT = 60 / BPM;          // 0.5 s = 30 frames: every beat lands on a frame boundary
 export const BAR = BEAT * 4;           // 2 s
-export const BARS = 21;
-export const DURATION = BAR * BARS;    // 42 s
-export const FRAMES = Math.round(DURATION * FPS); // 2520
+export const BARS = 30;
+export const DURATION = BAR * BARS;    // 60 s
+export const FRAMES = Math.round(DURATION * FPS); // 3600
 
 // Nova Pitch tokens, from relatefy/frontend/app/relatefy.css (the W6 "Electric Cobalt → Cyan" palette fence,
 // dark theme) and components/marketing/marketing.css.

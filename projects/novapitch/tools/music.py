@@ -3,6 +3,7 @@
 #   python3 projects/novapitch/tools/music.py [--seed 7] [--name take1]
 # Writes assets/music/<name>.mp3 and assets/music/<name>.json (plan, seed, song id).
 import os, sys, json, argparse, urllib.request
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
@@ -19,37 +20,14 @@ def api_key():
                 return line.split('=', 1)[1].strip().strip('"').strip("'")
     sys.exit('ELEVENLABS_API_KEY not found (env or repo-root .env)')
 
-BAR = 2000  # ms at 120 BPM
+from plan import SECTIONS, BAR_S
+BAR = int(BAR_S * 1000)  # ms
 # Genre anchors that every chunk repeats. The first chunk must NOT mention drums or bass: it is the silent intro,
 # and chunk-1 styles set the whole song (takes 1–2 of the first plan ignored "near silence" for that reason).
 GENRE = ['instrumental', 'modern cinematic electronic score', 'premium tech product launch film', '120 BPM', '4/4',
          'glossy analog synths', 'wide stereo', 'polished modern production']
 NEG_ALL = ['vocals', 'singing', 'choir', 'spoken word', 'lyrics', 'guitar', 'orchestral trailer braams', 'dubstep wobble',
            'festival EDM supersaw drop', 'lo-fi', 'corporate ukulele', 'cheesy', 'chiptune']
-# (name, bars, text, positive, negative, adherence)
-SECTIONS = [
-    ('Void', 3, '[Intro]', ['dark ambient intro', 'deep sub-bass drone only', 'a soft clock-like tick on every beat',
-                             'one lonely distant synth pluck', 'vast empty space', 'quiet tension', 'nearly silent by the last beat'],
-     ['drums', 'kick drum', 'snare', 'hi-hats', 'percussion groove', 'bass line', 'loud'], 'high'),
-    ('Ignition', 2, '[Drop]\n{massive impact hit exactly on the first beat}',
-     ['huge cinematic impact on beat one', 'punchy drums enter on beat one', 'pulsing sixteenth-note synth bass',
-      'bright shimmering synth swell', 'uplifting burst of energy'], ['fade in', 'quiet start', 'ambient'], 'low'),
-    ('It reads', 3, '[Groove]', ['driving four-on-the-floor groove', 'crisp closed hi-hats', 'sparkling synth arpeggio',
-                                  'forward momentum', 'clever and precise'], [], 'high'),
-    ('One link', 2, '[Build]\n{snare roll accelerating into the next downbeat}',
-     ['rising build', 'accelerating snare roll', 'white-noise riser', 'filter sweep opening'], ['breakdown', 'silence'], 'high'),
-    ('Conversation', 3, '[Verse]', ['lighter bouncy groove', 'muted plucked synths', 'filtered drums',
-                                     'space in the midrange for a speaking voice', 'warm, human, playful'],
-     ['loud lead synth', 'busy melody'], 'medium'),
-    ('Signal', 3, '[Peak]', ['peak energy', 'full drums with claps', 'big sub bass', 'euphoric wide synth chords',
-                              'driving and triumphant'], ['quiet', 'breakdown'], 'medium'),
-    ('Breath', 2, '[Breakdown]\n{reverse swell sucking into the next downbeat}',
-     ['breakdown', 'all drums drop out', 'warm evolving pads', 'soft reversed swells', 'emotional and hopeful'],
-     ['kick drum', 'drums', 'hi-hats', 'snare'], 'low'),
-    ('Finale', 4, '[Finale]\n{massive final hit on the first beat, then a long ringing tail}',
-     ['massive final impact on beat one', 'triumphant sustained major chord', 'sparkling shimmer', 'gentle pulsing outro',
-      'decays to silence by the end'], ['abrupt cut', 'new groove'], 'medium'),
-]
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--seed', type=int, default=None)

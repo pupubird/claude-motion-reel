@@ -15,10 +15,11 @@
     "zm:stills": "node projects/zemyth/render.mjs --samples=1 --stills=150,300,500,820,1000,1300,1440,1700",
     "zm:check": "python3 projects/zemyth/tools/check_frames.py projects/zemyth/out/zemyth-reel-2026.mp4 && python3 projects/zemyth/tools/check_audio.py projects/zemyth/out/soundtrack.wav",
     "np:assets": "sh projects/novapitch/tools/prep_assets.sh",
-    "np:stills": "node projects/novapitch/render.mjs --samples=1 --stills=120,360,600,745,1010,1190,1420,1640,1830,2080,2170,2420",
+    "np:stills": "node projects/novapitch/render.mjs --samples=1 --stills=120,400,600,800,1080,1440,1600,1800,2000,2280,2600,2900,3300",
     "np:audio": "node projects/novapitch/render.mjs --audio && python3 projects/novapitch/tools/check_audio.py projects/novapitch/out/soundtrack.wav",
     "np:render": "node projects/novapitch/render.mjs --samples=8 --workers=3",
-    "np:check": "python3 projects/novapitch/tools/check_frames.py projects/novapitch/out/novapitch-film-2026.mp4 && python3 projects/novapitch/tools/check_audio.py projects/novapitch/out/soundtrack.wav"
+    "np:check": "python3 projects/novapitch/tools/check_frames.py projects/novapitch/out/novapitch-film-2026.mp4 && python3 projects/novapitch/tools/check_audio.py projects/novapitch/out/soundtrack.wav",
+    "np:read": "node projects/novapitch/tools/check_reading.mjs"
   },
   "keywords": [],
   "author": "",

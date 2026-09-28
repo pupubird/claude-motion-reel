@@ -1,8 +1,8 @@
-// The soundtrack: the score (ElevenLabs Music, take t6 — measured 120.00 BPM, C major / A minor), the Digital
+// The soundtrack: the score (ElevenLabs Music take t6, re-cut on the bar grid to 30 bars — 120.00 BPM), the Digital
 // Twin's voice (ElevenLabs TTS), and foley synthesised from the same score the visuals read, so every whoosh,
 // key, pop and hit lands on its frame. Pitched foley sits in C-major pentatonic so it never fights the music.
 // Mixed offline (OfflineAudioContext); render.mjs loudness-normalises the result (two-pass loudnorm, −14 LUFS).
-import { BEAT, DURATION } from './config.js';
+import { BEAT, BARS, DURATION } from './config.js';
 import { rng } from './util.js';
 import * as S from './score.js';
 import { VO } from './assets.js';
@@ -46,7 +46,9 @@ export async function renderSoundtrack() {
   const stem = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('stem') : null;
   // foley rides over a loud, mastered score: lift it per section (measured with tools/stems: it sat 20–35 dB
   // under the groove), less where the score is sparse or already hits hard
-  const FX_BARS = [1.6, 1.6, 1.6, 1.3, 4, 4, 4, 4, 4, 4, 4.5, 4.5, 4.5, 4, 4, 4, 2.2, 2.2, 1.2, 1.6, 1.6];
+  //            void           drop groove (acts II–IV)        room (VO)          signal · payoff race   breakdown  hit  tail
+  const FX_BARS = [1.6, 1.6, 1.6, 1.3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4.5, 4.5, 4.5, 4.5, 4, 4, 4, 4, 4, 4, 2.2, 2.2, 1.2, 1.6, 1.6, 1.6];
+  if (FX_BARS.length !== BARS) throw new Error(`FX_BARS has ${FX_BARS.length} bars, the film ${BARS}`);
   FX_BARS.forEach((k, b) => fx.gain.setValueAtTime(stem && stem !== 'sfx' ? 0 : 0.85 * k, b * 2));
 
   /* ── the score: ducked and mid-scooped under the voice ─ */
@@ -60,8 +62,8 @@ export async function renderSoundtrack() {
   musG.gain.setValueAtTime(0.4, v1 - 0.2); musG.gain.linearRampToValueAtTime(0.72, v1 + 0.35);
   scoop.gain.setValueAtTime(0, v0 - 0.12); scoop.gain.linearRampToValueAtTime(-5, v0 + 0.05);
   scoop.gain.setValueAtTime(-5, v1 - 0.2); scoop.gain.linearRampToValueAtTime(0, v1 + 0.35);
-  // "that end in silence.": the score drops out under the word, the N is signed in near-silence, the tile hits
-  const s0 = B(S.PAYOFF.w2 + 2.4), s1 = B(S.SIGN.tile);
+  // "that end in silence.": the groove drops to the breakdown under the word; the N is signed in near-silence; the tile hits
+  const s0 = B(S.PAYOFF.sign0 - 0.1), s1 = B(S.SIGN.tile);
   musG.gain.setValueAtTime(0.72, s0); musG.gain.linearRampToValueAtTime(0.12, s0 + 0.35);
   musG.gain.setValueAtTime(0.12, s1 - 0.02); musG.gain.linearRampToValueAtTime(0.8, s1 + 0.01);
 
@@ -215,8 +217,8 @@ export async function renderSoundtrack() {
   riser(B(S.TWIN.riser0), B(S.LINK.fire), 0.12);
 
   /* ── act IV · one link ───────────────────────────────── */
-  suck(B(S.LINK.fire) - 0.03, B(S.LINK.fire) + 0.11, 0.1);
-  zing(B(S.LINK.fire + 0.2), B(S.LINK.field0 + 0.25), 700, 2600, 0.035, -0.5, 0.5);
+  suck(B(S.LINK.fire), B(S.LINK.point), 0.14);
+  zing(B(S.LINK.point), B(S.LINK.field0 + 0.2), 700, 2600, 0.035, -0.5, 0.5);
   glass(B(S.LINK.field0 + 0.4), 84, 0.03, 0);
   { const n = 22; for (let i = 0; i < n; i++) key(B(S.LINK.type0) + (B(S.LINK.type1) - B(S.LINK.type0)) * (i / n), 0.05, 0.1); }
   click(B(S.LINK.copy), 0.14, 0.4);
@@ -245,22 +247,19 @@ export async function renderSoundtrack() {
   for (let i = 0; i < 14; i++) tick(B(S.SIGNAL.heat0 + 0.5 + i * 0.09), 0.01, 5200, 0);        // count-up
   whoosh(B(S.SIGNAL.topics - 0.2), B(S.SIGNAL.topics + 0.5), 0.07, 0.8, 0.4, 900, 2600, 700);
   for (let i = 0; i < 4; i++) pop(B(S.SIGNAL.topics + 0.3 + i * 0.25), 520 + i * 70, 0.04, 0.5);
-  whoosh(B(S.SIGNAL.req - 0.1), B(S.SIGNAL.req + 0.5), 0.06, 1, 0.4, 900, 2600, 700);
-  click(B(S.SIGNAL.approve - 0.1), 0.13, 0.4);
-  bell(B(S.SIGNAL.approve + 0.1), 84, 0.035, 0.4, 0.9); bell(B(S.SIGNAL.approve + 0.2), 88, 0.03, 0.4, 0.9);
   // interest: the one warm, bright notification of the film
   [72, 76, 79, 84].forEach((m, i) => bell(B(S.SIGNAL.interest) + i * 0.06, m + 12, 0.05, (i - 1.5) * 0.25, 1.8));
   sparkle(B(S.SIGNAL.interest) + 0.1, 10, 0.8, 0.018);
   suck(B(S.SIGNAL.home0), B(S.SIGNAL.home1), 0.12);
 
   /* ── act VII · payoff ─────────────────────────────────── */
-  whoosh(B(S.PAYOFF.in), B(S.PAYOFF.w2), 0.2, -0.6, 0.6, 300, 4200, 500);
-  zing(B(S.PAYOFF.in), B(S.PAYOFF.w2), 600, 1800, 0.022, -0.5, 0.5);
-  sparkle(B(S.PAYOFF.in + 0.4), 60, B(S.PAYOFF.w2 + 1.5) - B(S.PAYOFF.in + 0.4), 0.02);     // every deck lighting
-  riser(B(S.PAYOFF.w2), B(S.PAYOFF.collapse0), 0.08, 200, 3000);
+  whoosh(B(S.PAYOFF.in), B(S.PAYOFF.race1), 0.2, -0.6, 0.6, 300, 4200, 500);
+  zing(B(S.PAYOFF.in), B(S.PAYOFF.race1), 600, 1800, 0.022, -0.5, 0.5);
+  sparkle(B(S.PAYOFF.in + 0.4), 60, B(S.PAYOFF.race1 + 1.5) - B(S.PAYOFF.in + 0.4), 0.02);     // every deck lighting
+  riser(B(S.PAYOFF.race1), B(S.PAYOFF.collapse0), 0.08, 200, 3000);
   suck(B(S.PAYOFF.collapse0), B(S.PAYOFF.collapse1) + 0.02, 0.22);
   // the N, signed: the pen's pitch follows the stroke — up, down the diagonal, up
-  const p0 = B(S.PAYOFF.sign0), p1 = B(S.PAYOFF.sign1), pl = (p1 - p0) / 3;
+  const p0 = B(S.PAYOFF.pen0), p1 = B(S.PAYOFF.sign1), pl = (p1 - p0) / 3;
   zing(p0, p0 + pl, mtof(79), mtof(86), 0.035, -0.3, -0.3);
   zing(p0 + pl, p0 + 2 * pl, mtof(86), mtof(76), 0.035, -0.3, 0.3);
   zing(p0 + 2 * pl, p1, mtof(76), mtof(88), 0.035, 0.3, 0.3);

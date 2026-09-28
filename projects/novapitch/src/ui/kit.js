@@ -13,6 +13,7 @@ export function text(ctx, s, x, y, { f = FONTS.sans, w = 400, size = 16, color =
   ctx.fillStyle = color;
   ctx.fillText(s, x, y);
   ctx.letterSpacing = '0px';
+  if (globalThis.__textlog) globalThis.__textlog.push({ s, a: ctx.globalAlpha, dy: 0 });   // reading-time audit
   return ctx.measureText(s).width;
 }
 

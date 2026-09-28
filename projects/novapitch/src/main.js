@@ -29,6 +29,10 @@ function toB64(bytes) {
 }
 
 window.renderFrame = (frame, samples = 8) => engine.renderFrame(frame, samples);
+// reading-time audit: every string drawn on a frame, with how visible it was (tools/check_reading.mjs)
+if (params.has('textlog')) {
+  window.textLogFrame = (frame) => { globalThis.__textlog = []; engine.renderFrameSync(frame, 1); const log = globalThis.__textlog; globalThis.__textlog = null; return log; };
+}
 window.renderAudioWav = async () => {
   const { bytes, peak } = audio.encodeWav(await audio.renderSoundtrack());
   return { b64: toB64(bytes), peak };

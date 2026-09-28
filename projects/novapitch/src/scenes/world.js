@@ -103,8 +103,8 @@ const linkU = (gb) => ease.inOutCubic(clamp((gb - LINK.launch) / (LINK.arrive - 
 // Act VII–VIII: observe the payoff line light the field, rise over the galaxy, fall onto its collapsed centre
 const C7 = { p0: PARK.clone().add(V(-900, 1300, 4800)), l0: PARK.clone().add(V(300, -200, -1500)) };
 function camPayoff(gb) {
-  const a = seg(gb, PAYOFF.in, PAYOFF.w2, ease.inOutSine);
-  const b = seg(gb, PAYOFF.w2 - 0.5, PAYOFF.collapse0, ease.inOutCubic);
+  const a = seg(gb, PAYOFF.in, PAYOFF.race1, ease.inOutSine);
+  const b = seg(gb, PAYOFF.race1 - 0.5, PAYOFF.collapse0, ease.inOutCubic);
   const c = seg(gb, PAYOFF.collapse0, PAYOFF.sign0, ease.inOutCubic);
   const pos = C7.p0.clone().lerp(PARK.clone().add(V(1800, 3000, 6600)), a);
   pos.lerp(PARK.clone().add(V(0, 9400, 8800)), b);
@@ -118,7 +118,7 @@ function camPayoff(gb) {
 }
 
 function camAt(gb) {
-  if (gb >= PAYOFF.in) return camPayoff(gb);
+  if (gb >= PAYOFF.pre) return camPayoff(gb);   // starts under the signal's folding card (signal.js hands over)
   const pos = V(0, 0, D), look = V(0, 0, 0);
   let roll = 0;
   // Act I — powers of ten out to the galaxy; a lean toward our deck while someone seems to type
@@ -133,9 +133,9 @@ function camAt(gb) {
   pos.lerp(PARK.clone().add(V(0, 0, 980)), push);
   look.lerp(PARK, seg(gb, NOVA.push0, NOVA.push0 + 1.6, ease.inOutSine));
   // Act III — hold the hero framing and creep in while the pages stream past the lens into the orb
-  const creep3 = seg(gb, READ.spawn0, 30, ease.inOutSine);
+  const creep3 = seg(gb, READ.spawn0, LINK.fire - 2, ease.inOutSine);
   if (gb > NOVA.form1) {
-    const gather = seg(gb, TWIN.title - 0.5, LINK.fire, ease.inOutSine);
+    const gather = seg(gb, TWIN.gather, LINK.fire, ease.inOutSine);
     const a = lerp(0, -0.22, creep3) - 0.5 * gather, r = lerp(980, 900, creep3) - 150 * gather;
     pos.set(PARK.x + Math.sin(a) * r, PARK.y + lerp(0, 70, creep3) + 110 * gather, PARK.z + Math.cos(a) * r);
     look.copy(PARK);
@@ -209,14 +209,13 @@ export default {
     for (let k = 0; k < 8; k++) { const c = card(SLIDES[k], 320, 180); ring.push(c); scene.add(c.mesh); }
     link = new Ribbon(700);
     link.setPath(linkPts);
-    // the payoff line: from the frame centre (where Act VI's lime point sits) through the field, lighting every deck
-    const f0 = C7.l0.clone().sub(C7.p0).normalize();
-    const P0 = C7.p0.clone().addScaledVector(f0, D);
+    // the payoff line: out of the point Act VI's interest folds into (home, PARK) and through the field, lighting every deck
+    const P0 = PARK.clone();
     payoff = new Ribbon(800);
     payoff.setPath(spline([P0, PARK.clone().add(V(-1700, 500, 1600)), PARK.clone().add(V(-2600, -300, -1400)), PARK.clone().add(V(-300, 250, -3400)),
       PARK.clone().add(V(2500, -250, -1600)), PARK.clone().add(V(2300, 350, 1700)), PARK.clone().add(V(-200, 0, 700)), PARK.clone()], 70));
     scene.add(payoff.mesh);
-    const pts = payoff.points, times = pts.map((_, i) => B(PAYOFF.in) + (i / (pts.length - 1)) * (B(PAYOFF.w2) - B(PAYOFF.in)));
+    const pts = payoff.points, times = pts.map((_, i) => B(PAYOFF.in) + (i / (pts.length - 1)) * (B(PAYOFF.race1) - B(PAYOFF.in)));
     field.scheduleIgnition(pts, times, 1500);
     scene.add(link.mesh);
     // the recipient's screen: the room, rendered by the same function as the 2D shot, so the cut is invisible
@@ -237,7 +236,7 @@ export default {
           vec2 q = abs(vUv - 0.5) * 2.0;
           float rim = exp(-(1.0 - max(q.x, q.y)) / 0.004);
           vec3 dark = vec3(0.006, 0.01, 0.03) + vec3(0.25, 0.5, 1.2) * rim * 1.4;
-          vec3 col = mix(dark, c, lit) + vec3(0.6, 0.85, 1.4) * edge * 2.0;
+          vec3 col = mix(dark, c, lit) + vec3(0.6, 0.85, 1.4) * edge * 0.9;
           gl_FragColor = vec4(col * uAlpha, uAlpha);
         }`,
       transparent: true, depthWrite: true,
@@ -276,7 +275,7 @@ export default {
       F.uTrail.value = 1;
       // the opening galaxy: lit, then darkness closes in along the arms toward our deck (the last light);
       // during the dive into the nova it unfolds into the local field around the orb
-      if (gb < PAYOFF.in) {
+      if (gb < PAYOFF.pre) {
         F.uGalaxy.value = 1 - seg(gb, NOVA.push0, NOVA.form1, ease.inOutCubic);
         F.uGalC.value.copy(GC);
         F.uGalSpin.value = 0;
@@ -313,15 +312,15 @@ export default {
       const born = gb >= NOVA.form0 - 0.5;
       const breathe = 1 + 0.015 * Math.sin(t * 2.2);
       orb.set({ camera, pos: PARK, r: 120 * lerp(0.2, 1, form) * breathe, time: t, visible: born,
-        normal: V(Math.sin(t * 0.45) * 0.35, 1, Math.cos(t * 0.31) * 0.3), level: -0.08 + 0.05 * Math.sin(t * 0.7), wave: 0.035,
+        normal: V(Math.sin(t * 0.45) * 0.35, 1, Math.cos(t * 0.31) * 0.3), level: -0.08 + 0.05 * Math.sin(t * 0.7),
         heat: 1 - seg(gb, NOVA.form0 - 0.3, NOVA.form0 + 0.9, ease.outCubic), glow: lerp(0, 0.9, form), bright: 1, speak: 0,
-        wave: 0.035 + 0.05 * seg(gb, TWIN.title, LINK.fire, ease.inCubic) });
+        wave: 0.035 + 0.05 * seg(gb, TWIN.gather, LINK.fire, ease.inCubic) });
 
-      /* ── Act IV: Nova collapses to the point that becomes the link; the live line; the screen ── */
-      const col = seg(gb, LINK.fire, LINK.fire + 0.22, ease.inExpo);
-      if (col > 0) {
+      /* ── Act IV: Nova implodes into the point that becomes the link; the live line; the screen ── */
+      const col = seg(gb, LINK.fire, LINK.point, (p) => (p < 0.4 ? -0.15 * Math.sin(Math.PI * p / 0.4) : ease.inOutCubic((p - 0.4) / 0.6)));   // swells ~15 %, then implodes
+      if (gb >= LINK.fire) {
         orb.uniforms.uR.value *= 1 - col;
-        orb.uniforms.uHeat.value = Math.max(orb.uniforms.uHeat.value, col);
+        orb.uniforms.uHeat.value = Math.max(orb.uniforms.uHeat.value, clamp(col));
         orb.group.visible = col < 1;
       }
       const lu = linkU(gb);
@@ -333,34 +332,39 @@ export default {
       F.uHeadR.value = 460;
       screen.visible = gb >= LINK.launch - 0.5 && gb < ROOM.in + 1;
       screenMat.uniforms.uAlpha.value = seg(gb, LINK.launch - 0.5, LINK.launch + 0.8);
-      screenMat.uniforms.uOn.value = seg(gb, LINK.arrive - 0.05, ROOM.in - 0.1, ease.outCubic);
+      screenMat.uniforms.uOn.value = seg(gb, LINK.arrive - 0.25, ROOM.in - 0.1, ease.inOutSine);
       if (gb >= LINK.fire && gb < LINK.launch) {
-        // the point burns only while it is a point: gone while the field is open, back for the fold and launch
-        const pt = (1 - seg(gb, LINK.fire + 0.25, LINK.field0 + 0.2)) + seg(gb, LINK.fold + 0.2, LINK.launch);
-        flare.set({ pos: PARK, size: 600, coreR: 16, core: 0.5 * pt, streak: 0.3 * pt, rays: 0, ring: 0 });
+        // the orb's light gathers into the point as it implodes; the point burns while it is a point, is gone
+        // while the field is open, and comes back for the fold and the launch
+        const gath = clamp(col);
+        const pt = Math.max(gath * (1 - seg(gb, LINK.point + 0.1, LINK.field0 + 0.3)), seg(gb, LINK.fold + 0.2, LINK.launch));
+        // the glow swells as the orb shrinks, then contracts into the star over half a beat (no pop between them)
+        const coreR = gb < LINK.point ? 16 + 50 * gath : lerp(66, 16, seg(gb, LINK.point, LINK.point + 0.5, ease.outCubic));
+        flare.set({ pos: PARK, size: lerp(900, 600, gath), coreR, core: 0.9 * pt, streak: 0.45 * pt,
+          rays: 0.3 * gath * (1 - seg(gb, LINK.point, LINK.field0)), ring: 0 });
       }
       else if (gb >= LINK.launch && gb < LINK.arrive + 0.2) flare.set({ pos: hp, size: 700, coreR: 14, core: 0.45, streak: 0.15, rays: 0, ring: 0 });
 
       /* ── Act VII: the line lights every ignored deck; the field becomes a galaxy; the galaxy collapses ── */
-      const pu = ease.inOutSine(seg(gb, PAYOFF.in, PAYOFF.w2));
+      const pu = ease.inOutSine(seg(gb, PAYOFF.in, PAYOFF.race1));
       payoff.set({ head: Math.max(1e-4, pu), tail: Math.max(0, pu - 0.35), width: 24, core: 1.9, bright: 1.15, fadeLen: 0.15,
-        visible: gb >= PAYOFF.in && gb < PAYOFF.w2 + 0.4 });
-      if (gb >= PAYOFF.in) {
-        const gx = seg(gb, PAYOFF.w2, PAYOFF.collapse0, ease.inOutCubic);
-        F.uLit.value = seg(gb, PAYOFF.w2 - 0.5, PAYOFF.w2 + 1.5, ease.inOutSine);
+        visible: gb >= PAYOFF.in && gb < PAYOFF.race1 + 0.4 });
+      if (gb >= PAYOFF.pre) {
+        const gx = seg(gb, PAYOFF.race1, PAYOFF.collapse0, ease.inOutCubic);
+        F.uLit.value = seg(gb, PAYOFF.race1 - 0.5, PAYOFF.race1 + 1.5, ease.inOutSine);
         F.uGalaxy.value = gx;
         F.uGalC.value.copy(PARK);
         F.uGalN.value.set(0, 1, 0);
-        F.uGalSpin.value = 0.9 * Math.pow(seg(gb, PAYOFF.w2, PAYOFF.sign0), 1.6) + 1.6 * Math.pow(seg(gb, PAYOFF.collapse0, PAYOFF.sign0), 2);
+        F.uGalSpin.value = 0.9 * Math.pow(seg(gb, PAYOFF.race1, PAYOFF.sign0), 1.6) + 1.6 * Math.pow(seg(gb, PAYOFF.collapse0, PAYOFF.sign0), 2);
         F.uCollapse.value = seg(gb, PAYOFF.collapse0, PAYOFF.collapse1, ease.inCubic);
-        F.uFogNear.value = 2600 + 20000 * seg(gb, PAYOFF.in, PAYOFF.w2);
-        F.uFogFar.value = 6500 + 30000 * seg(gb, PAYOFF.in, PAYOFF.w2);
+        F.uFogNear.value = 2600 + 20000 * seg(gb, PAYOFF.in, PAYOFF.race1);
+        F.uFogFar.value = 6500 + 30000 * seg(gb, PAYOFF.in, PAYOFF.race1);
         F.uAperture.value = 0.25;
         F.uWaveAmp.value = 0;
         field.group.visible = gb < PAYOFF.collapse1 + 0.1;
         const cp = seg(gb, PAYOFF.collapse0, PAYOFF.collapse1, ease.inCubic), gone = seg(gb, PAYOFF.sign0, PAYOFF.sign0 + 0.35);
-        if (!(gb >= NOVA.hit && gb < NOVA.hit + 12)) flare.set({ pos: PARK, size: 900, coreR: 20, core: (0.3 + 1.3 * cp) * (1 - gone), streak: 0.5 * cp * (1 - gone), rays: 0.3 * cp * (1 - gone), ring: 0 });
-        sky.uniforms.uNebula.value = lerp(0.8, 1.15, seg(gb, PAYOFF.w2, PAYOFF.collapse0)) * (1 - 0.35 * seg(gb, PAYOFF.collapse0, SIGN.tile));
+        flare.set({ pos: PARK, size: 900, coreR: 20, core: (0.3 + 1.3 * cp) * (1 - gone), streak: 0.5 * cp * (1 - gone), rays: 0.3 * cp * (1 - gone), ring: 0 });
+        sky.uniforms.uNebula.value = lerp(0.8, 1.15, seg(gb, PAYOFF.race1, PAYOFF.collapse0)) * (1 - 0.35 * seg(gb, PAYOFF.collapse0, SIGN.tile));
       }
 
       /* ── Act III: the pages stream in from beside the lens and the orb swallows them ── */

@@ -7,7 +7,7 @@ import { stepBadge } from '../ui/kit.js';
 import { Line, drawLine, riseLine, centerX, glint } from '../type.js';
 import { PROBE } from './world.js';
 
-let L1, L2, Lmeet, Lstep1, Lstep2;
+let L1, L2, Lmeet, STEPS;
 const SIZE = 112;
 
 /* ── Act I–II: Most decks get ignored. / See why yours won't. ───────────── */
@@ -116,31 +116,43 @@ function meet(ctx, t) {
   ctx.restore();
 }
 
-/* ── Act III: 1 Upload your deck. → 2 Build your Digital Twin. ─────────── */
-// The site's step badge (the gradient tile with a numeral) leads each title; it rolls 1 → 2 as the step changes.
+/* ── Acts III–IV: 1 Upload your deck. → 2 Build your Digital Twin. → 3 Share one link. ──────── */
+// One title bar for the three steps: the site's step badge (the gradient tile with a numeral) rolls to the next
+// numeral and the title swaps in place, so the chapter changes while the picture underneath transforms.
+function drawStep(ctx, s, x, y) {
+  drawLine(ctx, s.line, x, y, { fill: C.white, gradient: null,
+    each: s.grad == null ? undefined : (i) => (i >= s.line.words[s.grad].a ? { fill: 'gradient' } : null) });
+}
+
 function steps(ctx, t) {
   const gb = t / BEAT;
   if (gb < STEP.s1 - 0.1 || gb > STEP.out + 0.4) return;
   const y = 200, BS = 92, gap = 30;
-  const sw = seg(gb, STEP.s2 - 0.1, STEP.s2 + 0.5, ease.brand);
+  const at = [STEP.s1, STEP.s2, STEP.s3];
+  let k = 0;
+  while (k + 1 < at.length && gb >= at[k + 1] - 0.1) k++;
+  const sw = k ? seg(gb, at[k] - 0.1, at[k] + 0.5, ease.brand) : 1;          // swap progress from step k-1 into k
+  const prev = STEPS[Math.max(0, k - 1)], cur = STEPS[k];
   const out = seg(gb, STEP.out - 0.3, STEP.out + 0.3, ease.inCubic);
-  const w1 = BS + gap + Lstep1.width, w2 = BS + gap + Lstep2.width;
-  const x0 = W / 2 - lerp(w1, w2, sw) / 2;
+  const wOf = (s) => BS + gap + s.line.width;
+  const x0 = W / 2 - lerp(wOf(prev), wOf(cur), sw) / 2;
   const inP = ease.brand(clamp((t - B(STEP.s1)) / 0.5));
+  const L0 = STEPS[0].line;
   ctx.save();
   ctx.globalAlpha = 1 - out;
   // the badge
-  const by = y - Lstep1.ascent / 2 - BS / 2 - (out * 40);
-  stepBadge(ctx, x0, by, BS, '1', { next: '2', scale: ease.outBack(inP, 1.8), roll: sw });
-  // the title, swapped word-block by word-block
+  const by = y - L0.ascent / 2 - BS / 2 - (out * 40);
+  stepBadge(ctx, x0, by, BS, prev.n, { next: k ? cur.n : STEPS[1].n, scale: ease.outBack(inP, 1.8), roll: k ? sw : 0 });
+  // the title, swapped in place: the old one rises out of the band as the new one rises into it
   const tx = x0 + BS + gap;
-  const band = Lstep1.ascent + Lstep1.descent + 6;
-  ctx.beginPath(); ctx.rect(0, y - Lstep1.ascent - 10, W, band + 10); ctx.clip();
-  if (sw < 1) drawLine(ctx, Lstep1, tx, y + (1 - inP) * band - sw * band, { fill: C.white });
-  if (sw > 0) drawLine(ctx, Lstep2, tx, y + (1 - sw) * band + out * 0, { fill: C.white, gradient: null,
-    each: (i) => (i >= Lstep2.words[2].a ? { fill: 'gradient' } : null) });
-  if (sw < 0.01) glint(ctx, Lstep1, tx, y, seg(gb, STEP.s1 + 0.9, STEP.s1 + 2.0, ease.inOutSine), 0.45);
-  if (sw > 0.99) glint(ctx, Lstep2, tx, y, seg(gb, STEP.s2 + 1.0, STEP.s2 + 2.2, ease.inOutSine), 0.45);
+  const band = L0.ascent + L0.descent + 6;
+  ctx.beginPath(); ctx.rect(0, y - L0.ascent - 10, W, band + 10); ctx.clip();
+  if (!k) drawStep(ctx, cur, tx, y + (1 - inP) * band);
+  else {
+    if (sw < 1) drawStep(ctx, prev, tx, y - sw * band);
+    drawStep(ctx, cur, tx, y + (1 - sw) * band);
+  }
+  if (sw > 0.99) glint(ctx, cur.line, tx, y, seg(gb, at[k] + 1.0, at[k] + 2.2, ease.inOutSine), 0.45);
   ctx.restore();
 }
 
@@ -152,8 +164,11 @@ export default {
     L2 = new Line('See why yours won’t.', o);
     Lmeet = new Line('Meet Nova Pitch.', o);
     const o2 = { s: 96, w: 700 };
-    Lstep1 = new Line('Upload your deck.', o2);
-    Lstep2 = new Line('Build your Digital Twin.', o2);
+    STEPS = [
+      { n: '1', line: new Line('Upload your deck.', o2), grad: null },
+      { n: '2', line: new Line('Build your Digital Twin.', o2), grad: 2 },    // "Digital Twin." in the brand gradient
+      { n: '3', line: new Line('Share one link.', o2), grad: 1 },             // "one link."
+    ];
   },
   layers: [
     { start: B(TITLE1.w1 - 0.1), end: B(NOVA.push0 + 1.3), draw: heroPair },

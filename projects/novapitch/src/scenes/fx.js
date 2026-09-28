@@ -1,7 +1,7 @@
 // Global lens language: the drops kick the lens (chromatic aberration, a push, a short shake); the nova also
 // flashes. Full-frame flashes are rare and soft (photosensitivity: ≤ 3 large luminance flips per second).
 import { BEAT } from '../config.js';
-import { B, DROPS, NOVA, SIGN, ROOM, PAYOFF, hitPulse } from '../score.js';
+import { B, DROPS, NOVA, LINK, SIGN, ROOM, PAYOFF, hitPulse } from '../score.js';
 
 function fx(t) {
   let flash = 0, ca = 0, zoom = 1, sx = 0, sy = 0;
@@ -17,7 +17,8 @@ function fx(t) {
   }
   // 3D shots breathe on the score's hits; UI shots never move under a hit
   const gb = t / BEAT;
-  if (gb >= NOVA.hit && (gb < ROOM.in || gb >= PAYOFF.in) && gb < SIGN.tile) zoom *= 1 + 0.004 * hitPulse(t, 0.1);
+  const ui = (gb >= LINK.point && gb < LINK.launch) || (gb >= ROOM.in && gb < PAYOFF.in);
+  if (gb >= NOVA.hit && !ui && gb < SIGN.tile) zoom *= 1 + 0.004 * hitPulse(t, 0.1);
   const nv = t - B(NOVA.hit);
   if (nv >= 0 && nv < 0.6) flash = 0.42 * Math.exp(-nv / 0.05);
   const fade = t < 0.034 ? 1 : 0;   // two black frames, then the slide in close-up

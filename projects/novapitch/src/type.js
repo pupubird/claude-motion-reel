@@ -58,12 +58,19 @@ export function cssGradient(ctx, x, top, w, h, stops = GRAD_TEXT, deg = 135) {
 
 // Draw `line` with its baseline at (x, y). `each(i, g, word)` may return { a, dx, dy, sc, fill } per glyph.
 // `fill` is a colour or 'gradient'. Glyphs are drawn one by one at their measured positions.
-export function drawLine(ctx, line, x, y, { fill = '#fff', each = null, gradient = null } = {}) {
+export function drawLine(ctx, line, x, y, { fill = '#fff', each = null, gradient = null, log = true } = {}) {
   setFont(ctx, line.opt);
   ctx.letterSpacing = '0px';
   const grad = gradient ? cssGradient(ctx, x, y - line.ascent, line.width, line.ascent + line.descent, gradient) : null;
   const wordOf = (i) => line.words.findIndex((w) => i >= w.a && i < w.b);
   const os = line.glyphs.map((g, i) => (g.ch === ' ' || !each ? null : each(i, g, wordOf(i))));
+  // reading-time audit (tools/check_reading.mjs): how visible the whole line is on this frame
+  if (log && globalThis.__textlog) {
+    const ink = os.filter((o, i) => line.glyphs[i].ch !== ' ');
+    const a = Math.min(1, ...ink.map((o) => clamp(o?.a ?? 1)));
+    const dy = Math.max(0, ...ink.map((o) => Math.abs((o?.dy ?? 0)) + Math.abs(o?.dx ?? 0)));
+    globalThis.__textlog.push({ s: line.text, a: ctx.globalAlpha * a, dy });
+  }
   // glyphs asking for 'gradient' share one brand gradient spanning just their own box (like the site's gradient span)
   let gGrad = null;
   const gi = os.map((o, i) => (o?.fill === 'gradient' ? i : -1)).filter((i) => i >= 0);
@@ -134,6 +141,6 @@ export function glint(ctx, line, x, y, p, strength = 0.55) {
   ctx.clip();
   const g = ctx.createLinearGradient(bx - lean, 0, bx + bw + lean, 0);
   g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, `rgba(255,255,255,${strength})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-  drawLine(ctx, line, x, y, { fill: g });
+  drawLine(ctx, line, x, y, { fill: g, log: false });
   ctx.restore();
 }

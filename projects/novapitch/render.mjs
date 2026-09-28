@@ -7,45 +7,32 @@
 //   node projects/novapitch/render.mjs --scale=2               3840×2160 master (layout is resolution-independent)
 //   node projects/novapitch/render.mjs --gpu                   print the WebGL renderer string and exit
 //   node projects/novapitch/render.mjs --audio                 mix the soundtrack only → projects/novapitch/out/soundtrack.wav
-import { chromium } from 'playwright-core';
-import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { FPS, FRAMES } from './src/config.js';
+import { ROOT, serveFilm, launchChrome } from './tools/chrome.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(HERE, '../..');              // repo root: node_modules is shared
 const OUT = path.join(HERE, 'out');
 const SCALE = Number(args.scale ?? 1);
 const SAMPLES = Number(args.samples ?? 8);
 const from = Number(args.from ?? 0), to = Number(args.to ?? FRAMES);
+if (!(from >= 0 && to <= FRAMES && from < to)) throw new Error(`bad frame range --from=${args.from} --to=${args.to} (film is ${FRAMES} frames)`);
 const stills = args.stills ? String(args.stills).split(',').map(Number) : null;
 const WORKERS = Math.max(1, Number(args.workers ?? 1));
 const outFile = path.resolve(ROOT, args.out ?? `projects/novapitch/out/novapitch-film-2026${SCALE > 1 ? `-${1080 * SCALE}p` : ''}.mp4`);
 
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.woff2': 'font/woff2',
-  '.css': 'text/css', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.wav': 'audio/wav' };
-const server = http.createServer((req, res) => {
-  const p = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));
-  if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); res.end(); return; }
-  res.writeHead(200, { 'Content-Type': TYPES[path.extname(p)] || 'application/octet-stream' });
-  fs.createReadStream(p).pipe(res);
-});
-await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const q = new URLSearchParams({ mode: 'render', scale: String(SCALE) });
-if (args.scenes) q.set('scenes', args.scenes);
-if (args.stem) q.set('stem', args.stem);
-const url = `http://127.0.0.1:${server.address().port}/projects/novapitch/index.html?${q}`;
+const server = await serveFilm();
+const q = { mode: 'render', scale: String(SCALE) };
+if (args.scenes) q.scenes = args.scenes;
+if (args.stem) q.stem = args.stem;
+const url = server.url(q);
 
-const browser = await chromium.launch({
-  channel: 'chrome',
-  headless: true,
-  args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--disable-background-timer-throttling', '--disable-renderer-backgrounding'],
-});
+const browser = await launchChrome();
 let pageErrors = 0;
 
 async function openPage() {

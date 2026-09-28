@@ -109,7 +109,8 @@ function draw(ctx, t) {
   const ax = RAIL.x + RAIL.w * 0.5, ay = H * 0.72;          // drift toward the conversation
   ctx.translate(lerp(ax - ax * zoom, W / 2 - fx * zoom, z), lerp(ay - ay * zoom, H / 2 - fy * zoom, z));
   ctx.scale(zoom, zoom);
-  const dim = 0.8 * seg(gb, ROOM.in, ROOM.ask, ease.inOutSine) * (1 - seg(gb, ROOM.jump - 0.05, ROOM.jump + 0.5, ease.inOutSine));
+  // the room is seen first, undimmed; the deck dims only as the first title arrives
+  const dim = 0.8 * seg(gb, ROOM.ask - 0.5, ROOM.ask + 0.5, ease.inOutSine) * (1 - seg(gb, ROOM.jump - 0.05, ROOM.jump + 0.5, ease.inOutSine));
   const st = drawRoomFrame(ctx, t, { dim, blur: dim * 16 });
   // the cursor that clicks the citation
   const ans = st.msgs[st.msgs.length - 1];

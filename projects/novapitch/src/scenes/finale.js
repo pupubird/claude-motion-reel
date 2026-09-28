@@ -62,7 +62,7 @@ function penPoint(path, u) {
 }
 
 // The mark at (cx, cy) with size multiplier k. `draw` ∈ [0,1] (pen progress), `tile` ∈ [0,1] (bloom), `glow` extra light.
-function mark(ctx, cx, cy, k, drawP, tileP, glow, glintP = 0) {
+function mark(ctx, cx, cy, k, drawP, tileP, glow, glintP = 0, lead = 1) {
   const G = GLYPH;
   ctx.save();
   ctx.translate(cx, cy);
@@ -103,13 +103,15 @@ function mark(ctx, cx, cy, k, drawP, tileP, glow, glintP = 0) {
     }
     ctx.restore();
     // the pen: the film's line, still burning at the head
-    if (drawP < 1) {
-      const grd = ctx.createRadialGradient(pp.x, pp.y, 0, pp.x, pp.y, 70);
-      grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.18, 'rgba(125,227,244,0.8)'); grd.addColorStop(1, 'rgba(46,107,255,0)');
-      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(pp.x, pp.y, 70, 0, Math.PI * 2); ctx.fill();
-    }
-  }
+    if (drawP < 1) pen(ctx, pp.x, pp.y);
+  } else pen(ctx, G.path[0][0] * lead, G.path[0][1] * lead);   // the collapse point, travelling to the first stroke
   ctx.restore();
+}
+
+function pen(ctx, x, y) {
+  const grd = ctx.createRadialGradient(x, y, 0, x, y, 70);
+  grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.18, 'rgba(125,227,244,0.8)'); grd.addColorStop(1, 'rgba(46,107,255,0)');
+  ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(x, y, 70, 0, Math.PI * 2); ctx.fill();
 }
 
 function glyph(ctx, G, color) {
@@ -159,7 +161,9 @@ function payoffTitle(ctx, t, gb) {
 
 function signature(ctx, t, gb) {
   if (gb < PAYOFF.sign0) return;
-  const drawP = ease.inOutSine(seg(gb, PAYOFF.sign0, PAYOFF.sign1));
+  // the collapsed galaxy's point becomes the pen: it travels from the centre to the N's first stroke, then writes
+  const lead = seg(gb, PAYOFF.sign0, PAYOFF.pen0, ease.inOutSine);
+  const drawP = ease.inOutSine(seg(gb, PAYOFF.pen0, PAYOFF.sign1));
   const tileP = seg(gb, SIGN.tile, SIGN.tile + 0.55);
   const glow = Math.exp(-Math.max(0, (gb - SIGN.tile)) * BEAT / 0.35) * (gb >= SIGN.tile ? 1 : 0);
   // lockup: the mark shrinks and steps left; "Nova Pitch" wipes out of it; "Pitch Better." after a divider
@@ -179,7 +183,7 @@ function signature(ctx, t, gb) {
     wv.addColorStop(0, 'rgba(46,107,255,0)'); wv.addColorStop(0.75, `rgba(52,211,235,${0.22 * glow})`); wv.addColorStop(1, 'rgba(125,227,244,0)');
     ctx.fillStyle = wv; ctx.fillRect(0, 0, W, H);
   }
-  mark(ctx, cx, cy, k, drawP, tileP, glow, seg(gb, SIGN.glint, SIGN.glint + 1.4));
+  mark(ctx, cx, cy, k, drawP, tileP, glow, seg(gb, SIGN.glint, SIGN.glint + 1.4), lead);
   if (lk > 0) {
     const wx = lx0 + markW + gap, base = cy + WORD.ascent / 2 - 4;
     ctx.save();

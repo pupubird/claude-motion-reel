@@ -1,12 +1,14 @@
 // Act VI — the signal comes home: the owner sees what the recipient cared about. Slide 5 shrinks out of the
 // room into its slot in the deck's attention row (a match cut), attention rises off every slide (the showroom's
-// real dwell data), then the top questions, a file request approved, and the interest that ends the silence.
+// real dwell data), then the top questions, and the interest that ends the silence. The interest folds into a
+// point that hands over to Act VII's line without a cut: the 3D shot fades up under it.
 import { W, H, C, BEAT, FONTS } from '../config.js';
 import { ease, clamp, lerp, seg } from '../util.js';
 import { B, SIGNAL, PAYOFF } from '../score.js';
 import { SLIDES } from '../assets.js';
 import { Line, riseLine, centerX, glint } from '../type.js';
 import { SLIDE } from '../ui/room.js';
+import { PROBE } from './world.js';
 import { glass, text, chip, rr, measure } from '../ui/kit.js';
 import { icon } from '../ui/icons.js';
 
@@ -40,7 +42,7 @@ function slideCard(ctx, img, r, a = 1, hot = 0) {
 function fmt(sec) { const m = Math.floor(sec / 60), s = Math.round(sec % 60); return m ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`; }
 
 function attention(ctx, t, gb, vis) {
-  const into = seg(gb, SIGNAL.in, SIGNAL.in + 0.9, ease.inOutQuart);
+  const into = seg(gb, SIGNAL.in, SIGNAL.in + 2.0, ease.inOutCubic);   // slow enough to follow slide 5 home
   const back = seg(gb, SIGNAL.topics - 0.2, SIGNAL.topics + 0.7, ease.brand);    // the row steps back for the cards
   ctx.save();
   ctx.globalAlpha = vis * (1 - 0.72 * back);
@@ -74,13 +76,13 @@ function attention(ctx, t, gb, vis) {
     if (i === 4) {
       r = { x: lerp(from.x, to5.x, into), y: lerp(from.y, to5.y, into), w: lerp(from.w, to5.w, into), h: lerp(from.h, to5.h, into) };
     } else {
-      const p = ease.brand(seg(gb, SIGNAL.in + 0.25 + Math.abs(i - 4) * 0.08, SIGNAL.in + 1.0 + Math.abs(i - 4) * 0.08));
+      const p = ease.brand(seg(gb, SIGNAL.in + 0.6 + Math.abs(i - 4) * 0.1, SIGNAL.in + 1.9 + Math.abs(i - 4) * 0.1));
       r = { ...r, x: r.x + (i < 4 ? -1 : 1) * (1 - p) * 700 };
       a = p;
     }
     slideCard(ctx, img, r, a, i === 4 ? seg(gb, SIGNAL.heat0 + 0.6, SIGNAL.heat1) : 0);
     if (i === 4 && into < 1) {
-      const ra = 1 - seg(gb, SIGNAL.in, SIGNAL.in + 0.5);
+      const ra = 1 - seg(gb, SIGNAL.in + 0.4, SIGNAL.in + 1.4);
       ctx.save(); ctx.globalAlpha *= ra; ctx.lineWidth = 4; ctx.strokeStyle = C.iris400;
       ctx.shadowColor = 'rgba(46,107,255,0.8)'; ctx.shadowBlur = 18;
       rr(ctx, r.x + r.w * 0.062, r.y + r.h * 0.585, r.w * 0.2, r.h * 0.135, 14 * r.w / SLIDE.w); ctx.stroke(); ctx.restore();
@@ -126,32 +128,6 @@ function topicsCard(ctx, gb) {
   ctx.restore();
 }
 
-function requestCard(ctx, gb) {
-  const p = seg(gb, SIGNAL.req, SIGNAL.req + 0.6, ease.brand);
-  if (p <= 0) return;
-  const w = 860, h = 196, x = (W - w) / 2, y = 648;
-  const granted = gb >= SIGNAL.approve + 0.1;
-  const press = gb >= SIGNAL.approve - 0.1 ? Math.sin(Math.PI * clamp((gb - SIGNAL.approve + 0.1) / 0.35)) : 0;
-  ctx.save();
-  ctx.globalAlpha = p;
-  ctx.translate((1 - p) * 60, 0);
-  glass(ctx, x, y, w, h, 18, { fill: 'rgba(9,11,19,0.96)', border: 'rgba(255,255,255,0.12)' });
-  rr(ctx, x + 28, y + 30, 52, 52, 26); ctx.fillStyle = 'rgba(46,107,255,0.18)'; ctx.fill();
-  icon(ctx, 'folder', x + 40, y + 42, 28, C.iris300, 2.2);
-  text(ctx, 'Can I see the detailed security brief?', x + 100, y + 58, { size: 29, w: 600 });
-  text(ctx, 'Jordan Lee  ·  Northwind Energy', x + 100, y + 96, { size: 23, color: C.text3 });
-  // Approve Access (the product's white primary on dark), then the granted state
-  const bx = x + 100, by = y + 122, bw = 262, bh = 52;
-  ctx.save();
-  ctx.translate(bx + bw / 2, by + bh / 2); ctx.scale(1 - 0.06 * press, 1 - 0.06 * press); ctx.translate(-(bx + bw / 2), -(by + bh / 2));
-  rr(ctx, bx, by, bw, bh, 12); ctx.fillStyle = granted ? 'rgba(195,255,31,0.14)' : '#fff'; ctx.fill();
-  if (granted) { ctx.strokeStyle = 'rgba(195,255,31,0.4)'; ctx.lineWidth = 1.2; rr(ctx, bx + 0.5, by + 0.5, bw - 1, bh - 1, 12); ctx.stroke(); }
-  icon(ctx, 'check', bx + 20, by + 13, 26, granted ? C.lime : C.ink800, 2.6);
-  text(ctx, granted ? 'Access granted' : 'Approve Access', bx + 56, by + 35, { size: 24, w: 600, color: granted ? C.lime : C.ink800 });
-  ctx.restore();
-  ctx.restore();
-}
-
 function interest(ctx, gb) {
   // enters while the cards finish leaving (they are nearly transparent by then): no black frame between them
   const p = seg(gb, SIGNAL.interest - 0.2, SIGNAL.interest + 0.5, ease.brand);
@@ -188,32 +164,41 @@ function interest(ctx, gb) {
       ctx.restore();
     }
   }
-  // the point of light the payoff line leaves from
-  const pt = seg(gb, SIGNAL.home0 + 0.7, SIGNAL.home1 - 0.4, ease.outCubic);
+  // the point of light the payoff line leaves from: it holds while the 3D shot fades up under it, whitening from
+  // the live lime into the line's white-hot head, and goes as the head races off
+  const pt = seg(gb, SIGNAL.home0 + 0.7, SIGNAL.home1 - 0.4, ease.outCubic) * (1 - seg(gb, PAYOFF.in + 0.1, PAYOFF.in + 0.75, ease.inOutSine));
   if (pt > 0) {
     ctx.globalAlpha = 1;
+    const wh = seg(gb, SIGNAL.home1 - 0.75, PAYOFF.in + 0.25, ease.inOutSine);
+    const mix = (a, b) => a.map((v, i) => Math.round(v + (b[i] - v) * wh)).join(',');
+    const c0 = mix([250, 255, 235], [255, 255, 255]), c1 = mix([215, 255, 120], [200, 240, 255]), c2 = mix([195, 255, 31], [125, 227, 244]);
     const R = 150 + 30 * Math.sin((gb - SIGNAL.home1) * Math.PI * 4);
-    const g = ctx.createRadialGradient(W / 2, 540, 0, W / 2, 540, R);
-    g.addColorStop(0, `rgba(250,255,235,${pt})`); g.addColorStop(0.12, `rgba(215,255,120,${0.9 * pt})`); g.addColorStop(0.4, `rgba(195,255,31,${0.25 * pt})`); g.addColorStop(1, 'rgba(195,255,31,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(W / 2, 540, R, 0, Math.PI * 2); ctx.fill();
+    const go = seg(gb, PAYOFF.pre, PAYOFF.in, ease.inOutSine);          // onto home, where the line leaves from
+    const px = lerp(W / 2, PROBE.deck.x, go), py = lerp(540, PROBE.deck.y, go);
+    const g = ctx.createRadialGradient(px, py, 0, px, py, R);
+    g.addColorStop(0, `rgba(${c0},${pt})`); g.addColorStop(0.12, `rgba(${c1},${0.9 * pt})`); g.addColorStop(0.4, `rgba(${c2},${0.25 * pt})`); g.addColorStop(1, `rgba(${c2},0)`);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, R, 0, Math.PI * 2); ctx.fill();
     // a thin horizontal glint through it, like the flare's streak
-    const s2 = ctx.createLinearGradient(W / 2 - 420, 0, W / 2 + 420, 0);
-    s2.addColorStop(0, 'rgba(195,255,31,0)'); s2.addColorStop(0.5, `rgba(230,255,170,${0.7 * pt})`); s2.addColorStop(1, 'rgba(195,255,31,0)');
-    ctx.fillStyle = s2; ctx.fillRect(W / 2 - 420, 538, 840, 4);
+    const s2 = ctx.createLinearGradient(px - 420, 0, px + 420, 0);
+    s2.addColorStop(0, `rgba(${c2},0)`); s2.addColorStop(0.5, `rgba(${c1},${0.7 * pt})`); s2.addColorStop(1, `rgba(${c2},0)`);
+    ctx.fillStyle = s2; ctx.fillRect(px - 420, py - 2, 840, 4);
   }
   ctx.restore();
 }
 
 function draw(ctx, t) {
   const gb = t / BEAT;
+  ctx.save();
+  ctx.globalAlpha = 1 - seg(gb, PAYOFF.pre, PAYOFF.in + 0.25, ease.inOutSine);
   ctx.fillStyle = C.page;
   ctx.fillRect(0, 0, W, H);
+  ctx.restore();
   const dz = 1 + 0.035 * seg(gb, SIGNAL.in + 1, SIGNAL.interest, ease.inOutSine);
   ctx.translate(W / 2, H / 2); ctx.scale(dz, dz); ctx.translate(-W / 2, -H / 2);
   const rowVis = 1 - seg(gb, SIGNAL.interest - 0.55, SIGNAL.interest - 0.05, ease.inCubic);
   if (rowVis > 0) attention(ctx, t, gb, rowVis);
   const cardsVis = 1 - seg(gb, SIGNAL.interest - 0.55, SIGNAL.interest - 0.05, ease.inCubic);
-  if (cardsVis > 0) { ctx.save(); ctx.globalAlpha = cardsVis; topicsCard(ctx, gb); requestCard(ctx, gb); ctx.restore(); }
+  if (cardsVis > 0) { ctx.save(); ctx.globalAlpha = cardsVis; topicsCard(ctx, gb); ctx.restore(); }
   // "See what people actually care about." — the brand line, one row across the top
   const tOut = seg(gb, SIGNAL.interest - 0.55, SIGNAL.interest - 0.1, ease.inCubic);
   if (tOut < 1) {
@@ -233,5 +218,5 @@ export default {
   init() {
     T = new Line('See what people actually care about.', { s: 88, w: 700 });
   },
-  layers: [{ start: B(SIGNAL.in), end: B(PAYOFF.in), draw }],
+  layers: [{ start: B(SIGNAL.in), end: B(PAYOFF.in + 0.75), draw }],
 };

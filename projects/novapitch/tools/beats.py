@@ -2,14 +2,17 @@
 #   python3 projects/novapitch/tools/beats.py assets/music/take1.mp3 [--png out.png]
 # Reports: tempo (autocorrelation of spectral flux), grid phase, per-beat drift from the ideal grid,
 # per-bar loudness (the section contour), and the strongest transient near each planned hit.
-import sys, subprocess, argparse, json
+import os, sys, subprocess, argparse, json
 import numpy as np
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from plan import SECTIONS, section_bars, BAR_S
 
 ap = argparse.ArgumentParser()
 ap.add_argument('path')
 ap.add_argument('--png')
 ap.add_argument('--bpm', type=float, default=120.0)
 ap.add_argument('--json')
+ap.add_argument('--map', help='score-map.json: check a re-cut score against the film\'s bars')
 a = ap.parse_args()
 
 SR, HOP, N = 48000, 480, 2048
@@ -49,10 +52,11 @@ bpm = bpm_of(lag)
 # phase of the ideal grid (a.bpm) that maximises onset energy
 P = 60 / a.bpm
 phases = np.linspace(0, P, 200, endpoint=False)
+kenv = np.maximum(kick - np.convolve(kick, np.ones(50) / 50, mode='same'), 0)
 def score(ph):
     bt = np.arange(ph, dur, P)
-    idx = np.clip(np.round((bt - N / 2 / SR) * fps).astype(int), 0, len(env) - 1)
-    return env[idx].sum()
+    idx = np.clip(np.round((bt - N / 2 / SR) * fps).astype(int), 0, len(kenv) - 1)
+    return kenv[idx].sum()
 ph = phases[np.argmax([score(p) for p in phases])]
 
 # per-beat drift: local max of env within ±60 ms of each grid beat (only where there is an onset)
@@ -67,7 +71,7 @@ for k in range(int(dur / P)):
         drift.append((k, t[j] - g))
 d = np.array([v for _, v in drift]) if drift else np.zeros(1)
 
-print(f'{a.path}: {dur:.2f}s · autocorr tempo {bpm:.2f} BPM · best phase of the {a.bpm:g} BPM grid {ph * 1000:+.0f} ms')
+print(f'{a.path}: {dur:.2f}s · autocorr tempo {bpm:.2f} BPM · best phase of the {a.bpm:g} BPM grid (low band) {ph * 1000:+.0f} ms')
 print(f'beat drift vs grid (strong onsets, n={len(drift)}): median {np.median(d) * 1000:+.1f} ms · |p90| {np.percentile(np.abs(d), 90) * 1000:.1f} ms')
 
 # per-bar loudness (RMS dBFS)
@@ -85,7 +89,11 @@ for b in range(bars):
     print(f'{b + 1:>3} {b * BAR:5.1f}  {rms:6.1f}  {kf:7.1f} ' + '#' * int(max(0, rms + 45)))
 
 # strongest transient near planned hits
-HITS = [6.0, 10.0, 16.0, 20.0, 26.0, 32.0, 36.0]
+MAP = json.load(open(a.map))['map'] if a.map else None
+SB = section_bars(MAP)
+# every downbeat where the section changes (after the intro)
+sec_of = {b: name for name, bs in SB.items() for b in bs}
+HITS = [(b - 1) * BAR_S for b in sorted(sec_of) if b > 1 and sec_of[b] != sec_of[b - 1]]
 print('planned hit → strongest onset within ±150 ms (flux, rel. to median)')
 med = np.median(env[env > 0]) + 1e-9
 for h in HITS:
@@ -93,14 +101,15 @@ for h in HITS:
     j = np.argmax(np.where(m, env, -1))
     print(f'  {h:5.2f}s → {t[j]:6.3f}s ({(t[j] - h) * 1000:+4.0f} ms) strength ×{env[j] / med:5.1f}')
 
-# structure check against the storyboard: quiet intro, drop at bar 4, breakdown bars 17-18, hit at bar 19
+# structure check against the plan (tools/plan.py): quiet intro, the drop, a breakdown under the peak, the final hit
 R = {b: r for b, r, _ in rows}
 avg = lambda bs: 10 * np.log10(np.mean([10 ** (R[b] / 10) for b in bs if b in R]))
+vo, ig, cv, pk, br, fi = (SB[k] for k in ('Void', 'Ignition', 'Conversation', 'Signal', 'Breath', 'Finale'))
 checks = {
-    'intro (1-3) >= 6 dB under drop (4-5)': avg([4, 5]) - avg([1, 2, 3]),
-    'breakdown (17-18) >= 5 dB under peak (14-16)': avg([14, 15, 16]) - avg([17, 18]),
-    'finale (19) >= 5 dB over breakdown (17-18)': avg([19]) - avg([17, 18]),
-    'conversation (11-13) <= peak (14-16)': avg([14, 15, 16]) - avg([11, 12, 13]),
+    f'intro {vo[0]}-{vo[-1]} >= 6 dB under drop {ig[0]}-{ig[1]}': avg(ig[:2]) - avg(vo),
+    f'breakdown {br[0]}-{br[-1]} >= 5 dB under peak {pk[0]}-{pk[-1]}': avg(pk) - avg(br),
+    f'finale {fi[0]} >= 5 dB over breakdown': avg(fi[:1]) - avg(br),
+    f'conversation {cv[0]}-{cv[-1]} <= peak': avg(pk) - avg(cv),
 }
 need = [6, 5, 5, 0]
 for (k, v), n in zip(checks.items(), need):

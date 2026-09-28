@@ -2,6 +2,7 @@
 #   - near-black frames outside the intended open/close fades
 #   - blown frames (> 25 % of pixels clipped to white)
 #   - photosensitivity: large full-frame luminance flips (|Δ mean| > 0.2), at most 3 in any 1 s window
+#   - dips (reported, not gated): the picture falls dark between two lit shots — reads as a break, not a transition
 #   python3 tools/check_frames.py out/preview.mp4
 import sys, subprocess
 import numpy as np
@@ -26,6 +27,20 @@ print(f'frames {n} · mean luma {mean.min():.3f}–{mean.max():.3f}')
 print(f'near-black (mid-reel): {dark[:12]}{" …" if len(dark) > 12 else ""}')
 print(f'blown: {blown[:12]}{" …" if len(blown) > 12 else ""}')
 print(f'luminance flips > 0.2: {len(flips)} at {flips} · worst 1 s window: {worst}')
+# a dip: mean luma under 40 % of the dimmer of the shots either side (±0.1–0.75 s); a drop: the picture loses
+# more than 70 % of its light within 0.1 s. Both read as a break, not a transition (the opening's and the
+# signature's darkness are designed; judge those by eye).
+def runs(idx):
+    out = []
+    for i in idx:
+        if out and i - out[-1][1] <= 3: out[-1][1] = i
+        else: out.append([i, i])
+    return out
+dips = runs([i for i in range(45, n - 45) if (lo := min(mean[i - 45:i - 5].max(), mean[i + 5:i + 45].max())) > 0.02 and mean[i] < 0.4 * lo])
+drops = runs([i for i in range(n - 6) if mean[i] > 0.03 and mean[i + 6] < 0.3 * mean[i]])
+fmt = lambda rs: ', '.join(f'{a / 60:.2f}–{b / 60:.2f}s' for a, b in rs) or 'none'
+print(f'dips (dark between two lit shots): {fmt(dips)}')
+print(f'drops (light lost in 0.1 s): {fmt(drops)}')
 ok = not dark and not blown and worst <= 3
 print('FRAME GATE', 'PASS' if ok else 'FAIL')
 # per-second luma strip for eyeballing structure

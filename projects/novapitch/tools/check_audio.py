@@ -2,10 +2,11 @@
 #   python3 tools/check_audio.py out/soundtrack.wav
 import sys, wave, subprocess, re
 import numpy as np
-BPM, BARS = 120, 21
+BPM = 120
 path = sys.argv[1] if len(sys.argv) > 1 else 'out/soundtrack.wav'
 w = wave.open(path)
 sr, n, ch = w.getframerate(), w.getnframes(), w.getnchannels()
+BARS = round(n / sr / (60 / BPM * 4))
 x = np.frombuffer(w.readframes(n), dtype=np.int16).reshape(-1, ch).astype(np.float64) / 32768
 mono = x.mean(axis=1)
 bar = 60 / BPM * 4
@@ -15,7 +16,7 @@ for b in range(BARS):
     seg = mono[int(b * bar * sr):int((b + 1) * bar * sr)]
     rms = 20 * np.log10(np.sqrt(np.mean(seg ** 2)) + 1e-12)
     pk = 20 * np.log10(np.max(np.abs(seg)) + 1e-12)
-    flag = '  <-- quiet' if rms < -40 and b not in (0, 19, 20) else ''   # bar 1 is the near-silent void; bars 21-22 the tail
+    flag = '  <-- quiet' if rms < -40 and 0 < b < BARS - 3 else ''   # bar 1 is the near-silent void; the last 3 bars the tail
     if flag: fails.append(b + 1)
     print(f'{b + 1:>3}  {b * bar:5.2f}   {rms:7.1f}   {pk:7.1f}{flag}')
 r = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', path, '-af', 'ebur128=peak=true', '-f', 'null', '-'], capture_output=True, text=True).stderr
