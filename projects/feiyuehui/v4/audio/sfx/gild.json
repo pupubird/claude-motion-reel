@@ -1,0 +1,7 @@
+{
+ "name": "gild",
+ "text": "Molten gold flowing into fine grooves, a soft warm liquid metallic shimmer gliding downward, luxurious and smooth.",
+ "duration_seconds": 1.4,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

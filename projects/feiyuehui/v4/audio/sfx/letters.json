@@ -1,0 +1,7 @@
+{
+ "name": "letters",
+ "text": "Three soft quick metallic whooshes, each ending in a gentle gold click, letters landing.",
+ "duration_seconds": 1.4,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

@@ -1,0 +1,7 @@
+{
+ "name": "twinkle",
+ "text": "Delicate diamond sparkle twinkles, tiny high crystalline glints in a quick cascade.",
+ "duration_seconds": 1.6,
+ "prompt_influence": 0.7,
+ "model_id": "eleven_text_to_sound_v2"
+}

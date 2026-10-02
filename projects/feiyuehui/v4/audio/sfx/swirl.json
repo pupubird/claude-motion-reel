@@ -1,0 +1,7 @@
+{
+ "name": "swirl",
+ "text": "Many small polished stones swirling around in the air, soft whooshing vortex with light glassy clinks.",
+ "duration_seconds": 2.0,
+ "prompt_influence": 0.55,
+ "model_id": "eleven_text_to_sound_v2"
+}

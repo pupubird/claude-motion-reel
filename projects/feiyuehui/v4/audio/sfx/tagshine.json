@@ -1,0 +1,7 @@
+{
+ "name": "tagshine",
+ "text": "A delicate cascade of tiny crystal chimes, rising softly, elegant and light.",
+ "duration_seconds": 1.4,
+ "prompt_influence": 0.65,
+ "model_id": "eleven_text_to_sound_v2"
+}

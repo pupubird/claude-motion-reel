@@ -1,0 +1,7 @@
+{
+ "name": "carve",
+ "text": "Fine chisel carving into hard jade stone, crisp scraping strokes with tiny chips falling.",
+ "duration_seconds": 1.6,
+ "prompt_influence": 0.65,
+ "model_id": "eleven_text_to_sound_v2"
+}

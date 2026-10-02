@@ -1,0 +1,7 @@
+{
+ "name": "seal",
+ "text": "A heavy stone seal stamped firmly onto paper on a wooden desk, one solid deep thud.",
+ "duration_seconds": 1.2,
+ "prompt_influence": 0.7,
+ "model_id": "eleven_text_to_sound_v2"
+}

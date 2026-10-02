@@ -1,0 +1,7 @@
+{
+ "name": "orbit",
+ "text": "An accelerating swirling whoosh, objects circling faster and faster, rising in pitch, building tension.",
+ "duration_seconds": 3.2,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

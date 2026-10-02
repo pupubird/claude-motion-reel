@@ -1,0 +1,105 @@
+{
+  "note": "Seedance 2.5 omni_reference re-render of the clay blockout (render.mjs --q=clay=1&notext=1). Chunks are cut-aligned; c2 and c4 are padded to whole seconds with the next shot's first 0.5 s, trimmed after. Type and logo go back from the matte (tools/v2v_comp.py). The reference photos (refs) are the client's product shots: local only, uploaded to Higgsfield per run (their media ids are kept in the git-ignored out/seedance/jobs.json, never in the repo).",
+  "refs": {
+    "ring": "out/seedance/src/ref_ring.png",
+    "buddha": "out/seedance/src/ref_buddha.png",
+    "guanyin": "out/seedance/src/ref_guanyin.png",
+    "pod": "out/seedance/src/ref_pod.png",
+    "tulip": "out/seedance/src/ref_tulip.png",
+    "bangle": "out/seedance/src/ref_bangle.png"
+  },
+  "chunks": [
+    {
+      "id": "c1",
+      "start": 0.0,
+      "dur": 14,
+      "keep": 14.0,
+      "images": [
+        "ring"
+      ],
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation of one unbroken camera move. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera position and movement, and the timing exactly. Do not use its grey clay materials.\n@Image 1 defines the ring's exact design and materials: the client's real ring, an oval imperial-green jadeite cabochon held by fine claws in a halo of pear-shaped and round brilliant diamonds, on a band of rose-cut diamonds, in polished platinum. Match this design exactly. Use only the ring, not the photo's white background or shadow.\n\nRe-render @Video 1 as hyper-realistic live-action footage, as if shot on an ARRI Alexa 35 for a luxury jewellery commercial.\n0-2.5 s: the camera flies low over a real sea of cloud at dawn toward a soft mint-green glow of light shining up through the clouds.\n2.5-6 s: the real ring from @Image 1 rises out of the clouds like the moon and hangs above the cloud sea, with clear sky on both sides of it.\n6-9.5 s: the camera pulls back over the cloud sea, swings to the side of the ring and passes through its band.\n9.5-11.5 s: about a hundred polished jadeite cabochons of many colours, white, pale green, apple green, oily green, flowered, spinach, icy, black and one imperial green, swirl in a three-arm spiral in the sky, then fall away into the clouds.\n11.5-14 s: the single imperial-green cabochon rises and hangs in the dawn sky above the clouds, with clear sky on both sides.\nReal photographed cumulus cloud with crisp sunlit billows, soft shadowed sides and fine wisps; real jadeite with true translucency and inner glow; real diamond brilliance and spectral fire with no starburst filter; real platinum reflections; natural depth of field, gentle halation, fine film grain. Bright, airy, pale cream-and-blush dawn palette, the sky turning soft blue as the camera climbs. No text, no logos, no people, no hands, no new objects."
+    },
+    {
+      "id": "c2",
+      "start": 14.0,
+      "dur": 7,
+      "keep": 6.5,
+      "images": [
+        "ring"
+      ],
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation with cuts at 3.5 s and 6.5 s. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera positions and movements, the cuts and the timing exactly. Do not use its grey clay materials.\n@Image 1 defines the ring's exact design and materials: the client's real ring, an oval imperial-green jadeite cabochon held by fine claws in a halo of pear-shaped and round brilliant diamonds, on a band of rose-cut diamonds, in polished platinum. Match this design exactly. Use only the ring.\n\nRe-render @Video 1 as hyper-realistic live-action footage from a luxury jewellery commercial, shot on an ARRI Alexa 35 with macro lenses.\n0-3.5 s: a jeweller's design studio. Warm hand-made toned paper fills the background, with soft bamboo-leaf shadows from the morning sun. The ring from @Image 1 floats in an exploded view, its parts separated along a vertical axis inside thin gold construction lines (circles and an axis), and the parts fly together into the finished ring. Keep the right side of the paper wall clear.\n3.5-6.5 s: a dim jade workshop. In macro, carved strokes are cut into a slab of translucent deep-emerald jadeite, with a spark of light at the cutting point and fine jade dust turning in a shaft of sunlight. The camera pulls back to the whole polished emerald plaque standing on a dark zitan wood block in front of a round ice-crack lattice moon window glowing with sunlight, the window's light glowing through the jade.\n6.5-7 s: a polished champagne-gold plate in macro.\nReal materials throughout: real translucent jadeite, real gold, real paper fibre, real wood grain, real dust in real sunlight, natural depth of field, fine film grain. Keep the colours and brightness of @Video 1. No text, no logos, no people, no hands, no tools, no new objects."
+    },
+    {
+      "id": "c3",
+      "start": 20.5,
+      "dur": 5,
+      "keep": 5.0,
+      "images": [
+        "buddha"
+      ],
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation with one cut at 3.5 s. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera positions and movements, the cut and the timing exactly. Do not use its grey clay materials.\n@Image 1 defines the Buddha pendant's exact design and materials: the client's real laughing-Buddha pendant in glassy apple-green jadeite, with its diamond-set bail and its crown of diamonds. Match this design exactly. Use only the pendant, not the black background or the chain.\n\nRe-render @Video 1 as hyper-realistic live-action footage from a luxury jewellery commercial, shot on an ARRI Alexa 35 with macro lenses.\n0-3.5 s: macro on a polished champagne-gold plate with engraved channels. Real brilliant-cut diamonds fall in slow motion and settle into the channels exactly where the clay stones are, turning and throwing spectral fire. The camera rises and pulls back to the whole plate: two Chinese characters set in diamonds on gold, with one diagonal sweep of warm sunlight across the polished gold. Keep every stone exactly in its place.\n3.5-5 s: sunrise over a real sea of cloud. The real Buddha pendant from @Image 1 hangs in the warm morning light, glowing green.\nReal diamonds, real gold, real jadeite with true translucency, real clouds, natural depth of field, fine film grain. Keep the colours and brightness of @Video 1. No text, no logos, no people, no hands, no new objects."
+    },
+    {
+      "id": "c4",
+      "start": 25.5,
+      "dur": 8,
+      "keep": 7.5,
+      "images": [
+        "guanyin",
+        "pod",
+        "tulip",
+        "bangle",
+        "buddha",
+        "ring"
+      ],
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation with quick cuts at 1.0 s, 1.5 s and 2.0 s. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera positions and movements, the cuts and the timing exactly. Do not use its grey clay materials.\n@Image 1 defines the Guanyin pendant's exact design: the client's real carved jadeite Guanyin pendant. Use only the pendant, not the cord or background.\n@Image 2 defines the pea-pod pendant's exact design: the client's real imperial-green jadeite pea pod with its diamond bail. Use only the pendant, not the chain or background.\n@Image 3 defines the flower-bud brooch's exact design: the client's real brooch, an imperial-green jadeite bud with diamond-paved leaves on a gold stem. Use only the brooch.\n@Image 4 defines the bangle's exact design: the client's real imperial-green jadeite bangle. Use only one bangle, not the background.\n@Image 5 defines the Buddha pendant's exact design: the client's real laughing-Buddha pendant with its diamond bail. Use only the pendant.\n@Image 6 defines the ring's exact design: the client's real imperial-green cabochon ring in its diamond halo. Use only the ring.\n\nRe-render @Video 1 as hyper-realistic live-action footage from a luxury jewellery commercial at sunrise above a real sea of cloud, shot on an ARRI Alexa 35.\n0-1.0 s: the Guanyin pendant from @Image 1 in close-up.\n1.0-1.5 s: the pea-pod pendant from @Image 2.\n1.5-2.0 s: the flower-bud brooch from @Image 3.\n2.0-4.5 s: the bangle from @Image 4; the camera pulls back to reveal six pieces, the bangle, the brooch, the Guanyin, the ring from @Image 6, the Buddha from @Image 5 and the pea pod, circling the rising sun in a ring above the clouds.\n4.5-7.5 s: the six pieces circle faster, trailing golden light, and draw in toward the sun.\n7.5-8 s: a burst of light from the sun.\nMatch each piece's real design exactly. Real jadeite with true translucency, real diamonds, real gold and platinum, real clouds and sunlight, natural depth of field, fine film grain. Keep the colours and brightness of @Video 1. No text, no logos, no people, no hands, no new objects."
+    },
+    {
+      "id": "c5",
+      "start": 33.0,
+      "dur": 7,
+      "keep": 7.0,
+      "images": [],
+      "prompt": "@Video 1 is a fine blockout reference: the finale of a film. Preserve its structure, the sun's position, the cloud layout, the light burst and its timing, and the camera movement exactly.\n\nRe-render @Video 1 as hyper-realistic live-action footage of a real sunrise above a real sea of cloud, shot on an ARRI Alexa 35.\n0-1 s: a burst of light from the sun, real god rays and a ring of light spreading across the sky, fine golden sparks drifting.\n1-7 s: the golden dawn sky settles; the sun glows low above the clouds; the camera drifts slowly closer. Keep the middle of the frame below the sun clear and calm.\nReal photographed clouds with sunlit tops, real atmospheric haze, natural lens flare, fine film grain. Keep the warm gold-and-violet palette and the brightness of @Video 1. No text, no logos, no people, no new objects."
+    }
+  ],
+  "release": {
+    "note": "What the released cut (tools/real_edit.json) is made of. c1, c2's 设计, c3's Buddha and c4 are takes of the chunks above. 雕刻 and 镶嵌 drifted inside their chunks (a needle tool, the plaque lost), so each was regenerated alone, freeze-padded to whole seconds. Write the timing labels from the clay's measured timing, and never ask to keep @Video 1's colours on a clay input (c3's plate came back beige).",
+    "carve": {
+      "film": [
+        17.5,
+        20.5
+      ],
+      "input": "clay 17.5–20.5 s + 1 s freeze, with the 描金 painted on from the gold-only matte (render.mjs --q=\"matte=1&gildmatte=1\"): gold (0.93, 0.70, 0.29) × (0.30 + 1.05 × clay luma), plus a hot front where the matte grew in the last two frames",
+      "images": [
+        "bangle"
+      ],
+      "duration": 4,
+      "take": "carve_gold_t4",
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation of one continuous shot with no cuts. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera position and movement, and the timing exactly. Do not use its grey clay materials, but keep its gold exactly where and when it appears.\n@Image 1 defines the jade's exact colour and quality: the client's imperial-green jadeite, vivid, glassy and even in colour. The plaque in @Video 1 is cut from this same jade. Take only its colour, translucency and polish from @Image 1, not its shape: there is no bangle in the scene.\n\nRe-render @Video 1 as hyper-realistic live-action footage from a luxury jewellery commercial, shot on an ARRI Alexa 35 with a macro lens, in a dim jade workshop.\n0-1.25 s: extreme macro on freshly carved strokes in the imperial-green jadeite: the strokes of a carved Chinese character exactly as in @Video 1, crisp polished groove walls, a tiny spark of light where the newest stroke ends, fine pale jade dust drifting in a shaft of warm sunlight. No tool, no needle, no hands anywhere in frame.\n1.25-2.25 s: the camera pulls back to reveal the whole plaque: a tall upright rectangle of polished imperial-green jadeite, taller than it is wide, with two large carved Chinese characters running down its face exactly as in @Video 1, standing on a dark zitan wood block. Behind it a round ice-crack lattice moon window glows with warm sunlight, and that light glows through the edge of the jade. As the camera pulls back, molten gold runs down into the carved strokes from the top of the plaque to its foot, exactly where and when @Video 1 turns gold, its leading edge glowing bright, and sets as polished gold leaf.\n2.25-4 s: hold on the plaque: both carved characters filled with gleaming gold leaf on vivid imperial-green jade.\nReal translucent jadeite with true depth and inner glow, real polished gold leaf, real polished zitan wood, real dust motes in real sunlight, natural depth of field, fine film grain. Dark surroundings with only the window and the plaque. No text overlays, no logos, no people, no hands, no tools, no props, no new objects."
+    },
+    "set": {
+      "film": [
+        20.5,
+        24.0
+      ],
+      "input": "clay 20.5–24.0 s + 0.5 s freeze",
+      "images": [],
+      "duration": 4,
+      "take": "set_t2",
+      "retime": "v2v_edit \"map\" [[0, 0.5], [2.0, 3.0], [3.5, 3.95]]: the take settles 1.2 s late, so the title gets its 1.5 s hold",
+      "prompt": "@Video 1 is a fine blockout reference: a grey clay animation of one continuous shot with no cuts. Preserve its subject structure, every object's shape, size, position and motion, the spatial layout, the camera position and movement, and the timing exactly. Do not use its grey clay materials.\n\nRe-render @Video 1 as hyper-realistic live-action footage from a luxury high-jewellery commercial, shot on an ARRI Alexa 35 with a macro lens.\nThe plate is solid polished champagne-gold metal, mirror-bright, not beige and not matte: it holds one soft diagonal sweep of warm light that fades into deep black-gold reflections. Engraved channels in the gold form two Chinese characters. Real brilliant-cut diamonds fall in slow motion and settle into the channels exactly where the clay stones are, each one throwing white light and spectral fire. The camera rises and pulls back to the whole plate with both characters set in diamonds. Keep every stone exactly in its place and the characters exactly as in @Video 1.\nReal polished gold, real diamonds, natural macro depth of field, fine film grain. Dark, rich, luxurious. No text overlays, no logos, no people, no hands, no tools, no new objects."
+    },
+    "claws": {
+      "film": [
+        11.0,
+        14.0
+      ],
+      "model": "kling_video_edit",
+      "mode": "pro",
+      "input": "c1 take 1, 11.0–14.0 s (the ring photo made Seedance set the loose cabochon in claws)",
+      "splice": "0.25 s crossfade at 11.0 s, inside the vortex",
+      "prompt": "Erase the four thin metal claws gripping the rim of the imperial-green jade cabochon that hangs in the sky. Where the claws were, show the smooth polished green edge of the stone and the sky behind it. Everything else in the video stays identical: the stone itself, the other falling cabochons, the blue sky, the cloud sea, the light and the camera move."
+    }
+  }
+}

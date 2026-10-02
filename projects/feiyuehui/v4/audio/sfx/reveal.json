@@ -1,0 +1,7 @@
+{
+ "name": "reveal",
+ "text": "A wide airy whoosh revealing a vast view, soft and majestic.",
+ "duration_seconds": 1.8,
+ "prompt_influence": 0.55,
+ "model_id": "eleven_text_to_sound_v2"
+}

@@ -1,0 +1,7 @@
+{
+ "name": "brush",
+ "text": "Calligraphy brush strokes on rice paper, three quick confident swishes.",
+ "duration_seconds": 1.6,
+ "prompt_influence": 0.65,
+ "model_id": "eleven_text_to_sound_v2"
+}

@@ -1,0 +1,7 @@
+{
+ "name": "burst",
+ "text": "A colossal cinematic impact and bright explosion of light, deep sub boom with a long golden shimmering tail.",
+ "duration_seconds": 4.0,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

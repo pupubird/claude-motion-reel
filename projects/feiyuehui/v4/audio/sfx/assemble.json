@@ -1,0 +1,7 @@
+{
+ "name": "assemble",
+ "text": "Precise tiny metallic clicks and snaps of jewellery parts fitting together, quick sequence, crisp.",
+ "duration_seconds": 1.2,
+ "prompt_influence": 0.65,
+ "model_id": "eleven_text_to_sound_v2"
+}

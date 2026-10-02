@@ -1,0 +1,7 @@
+{
+ "name": "riser",
+ "text": "Short fast cinematic riser whoosh building tension, cutting off sharply at the end.",
+ "duration_seconds": 1.0,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

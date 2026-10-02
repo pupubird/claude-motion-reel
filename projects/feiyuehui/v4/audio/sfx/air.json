@@ -1,0 +1,7 @@
+{
+ "name": "air",
+ "text": "Soft airy wind high above the clouds at dawn, gentle and ethereal, very calm, no birds.",
+ "duration_seconds": 6.0,
+ "prompt_influence": 0.5,
+ "model_id": "eleven_text_to_sound_v2"
+}

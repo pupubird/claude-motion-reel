@@ -1,0 +1,7 @@
+{
+ "name": "forge",
+ "text": "Magical molten gold forming and cooling, a rich metallic shimmer with a soft resonant ring.",
+ "duration_seconds": 1.8,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

@@ -1,0 +1,7 @@
+{
+ "name": "dive",
+ "text": "Fast smooth whoosh of a camera rushing forward through a ring, rising airy swoosh.",
+ "duration_seconds": 1.4,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

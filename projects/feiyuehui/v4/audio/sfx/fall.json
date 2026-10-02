@@ -1,0 +1,7 @@
+{
+ "name": "fall",
+ "text": "A cascade of small smooth stones falling away and receding downward, soft tinkling.",
+ "duration_seconds": 1.4,
+ "prompt_influence": 0.55,
+ "model_id": "eleven_text_to_sound_v2"
+}

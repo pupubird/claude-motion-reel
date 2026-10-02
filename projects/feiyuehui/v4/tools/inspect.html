@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8">
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+const names = new URLSearchParams(location.search).get('m').split(',');
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+const out = {};
+for (const n of names) {
+  const g = await loader.loadAsync(`/projects/feiyuehui/shared/assets/3d/models/${n}.glb`);
+  const rows = [];
+  g.scene.updateWorldMatrix(true, true);
+  g.scene.traverse((o) => {
+    const b = new THREE.Box3().setFromObject(o, true);
+    const s = b.getSize(new THREE.Vector3()), c = b.getCenter(new THREE.Vector3());
+    const f = (v) => v.toArray().map((x) => +(x * 1000).toFixed(2));
+    rows.push({ name: o.name, type: o.type, mat: o.material?.name, pos: f(o.position), rot: o.rotation.toArray().slice(0,3).map(x=>+x.toFixed(3)), scale: o.scale.toArray().map(x=>+x.toFixed(5)), size_mm: f(s), center_mm: f(c), verts: o.geometry?.attributes.position.count, inst: o.isInstancedMesh ? o.count : undefined, attrs: o.geometry ? Object.keys(o.geometry.attributes) : undefined, extras: Object.keys(o.userData||{}).length ? o.userData : undefined });
+  });
+  out[n] = rows;
+}
+window.__out = out; window.__ready = true;
+</script>

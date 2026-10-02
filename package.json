@@ -19,20 +19,27 @@
     "np:audio": "node projects/novapitch/render.mjs --audio && python3 projects/novapitch/tools/check_audio.py projects/novapitch/out/soundtrack.wav",
     "np:render": "node projects/novapitch/render.mjs --samples=8 --workers=3",
     "np:check": "python3 projects/novapitch/tools/check_frames.py projects/novapitch/out/novapitch-film-2026.mp4 && python3 projects/novapitch/tools/check_audio.py projects/novapitch/out/soundtrack.wav",
-    "np:read": "node projects/novapitch/tools/check_reading.mjs"
+    "np:read": "node projects/novapitch/tools/check_reading.mjs",
+    "fy:render": "node projects/feiyuehui/v4/render.mjs",
+    "fy:audio": "python3 projects/feiyuehui/v4/tools/sfx.py && python3 projects/feiyuehui/v4/tools/mix.py --score c6",
+    "fy:check": "python3 projects/feiyuehui/v4/tools/check_frames.py projects/feiyuehui/v4/out/feiyuehui-v4.mp4 && python3 projects/feiyuehui/v4/tools/check_audio.py projects/feiyuehui/v4/out/feiyuehui-v4.mp4",
+    "fy:real": "python3 projects/feiyuehui/v4/tools/v2v_comp.py --selftest && python3 projects/feiyuehui/v4/tools/v2v_edit.py projects/feiyuehui/v4/tools/real_edit.json projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_frames.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_audio.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/cormorant-garamond": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/inter-tight": "^5.3.0",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/noto-serif-sc": "^5.3.0",
     "lucide": "^1.48.0",
     "playwright-core": "^1.63.0",
     "three": "^0.186.1"

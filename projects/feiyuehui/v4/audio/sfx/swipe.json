@@ -1,0 +1,7 @@
+{
+ "name": "swipe",
+ "text": "A short clean whoosh swipe for a fast camera cut, smooth and airy.",
+ "duration_seconds": 0.7,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

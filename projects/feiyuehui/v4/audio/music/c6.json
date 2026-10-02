@@ -1,0 +1,195 @@
+{
+ "name": "c6",
+ "model": "music_v2_5",
+ "seed": 222,
+ "song_id": "MRqJ7Embg03cADwaefZN",
+ "total_ms": 40000,
+ "plan": {
+  "chunks": [
+   {
+    "text": "Near silence in drifting cloud: soft wind, airy string harmonics far away.\nA single guzheng harmonic rings out and fades. No drums, no bass. Very quiet, hushed, suspended.",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "cinematic luxury brand film score",
+     "modern Chinese orchestral hybrid",
+     "guzheng",
+     "dizi bamboo flute",
+     "bianzhong bronze bells",
+     "Chinese taiko drums",
+     "strings",
+     "deep sub pulses",
+     "120 BPM",
+     "4/4",
+     "D minor pentatonic",
+     "polished modern production",
+     "wide stereo",
+     "ethereal",
+     "airy string harmonics",
+     "guzheng harmonic",
+     "no drums",
+     "very quiet"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "choir",
+     "spoken word",
+     "lyrics",
+     "electric guitar",
+     "dubstep",
+     "trap hi-hats",
+     "EDM",
+     "lo-fi",
+     "chiptune",
+     "cheesy",
+     "kitsch",
+     "corporate ukulele",
+     "drums",
+     "percussion",
+     "bass",
+     "beat"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "The moon appears: a deep soft boom and a bright bianzhong bell, then a warm wide string chord blooms.\nA gentle low pulse starts on each downbeat. Luminous, noble, full of wonder.",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "warm string swell",
+     "bianzhong bells",
+     "soft low pulse",
+     "luminous",
+     "noble"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "heavy drums",
+     "distorted"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "Momentum: a plucked guzheng ostinato in sixteenth notes, light taiko and frame drum, low strings rising.\nHalfway through, a bright bell accent, then elegant and focused, precise and luxurious.",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "guzheng ostinato",
+     "sixteenth notes",
+     "light taiko",
+     "rising strings",
+     "precise"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "vocals"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "The atelier: a refined, steady groove of soft taiko and shakers, a bamboo flute melody, pipa and plucked strings.\nElegant, luxurious, crafted; slowly intensifying, a riser at the end, then silence on the final half beat.",
+    "duration_ms": 10000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "steady elegant groove",
+     "dizi flute melody",
+     "pipa",
+     "soft taiko",
+     "slowly intensifying",
+     "riser"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "vocals"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "A massive impact on the first beat: the sun rises. Huge taiko and full orchestra, soaring strings and brass.\nGuzheng glissandi over a driving taiko groove, majestic and triumphant, cinematic and grand.",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "massive impact",
+     "big taiko",
+     "soaring strings",
+     "guzheng glissando",
+     "majestic",
+     "triumphant"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "vocals",
+     "EDM drop",
+     "dubstep"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "Everything gathers: a rising orchestral crescendo, accelerating taiko roll and swelling strings, tension climbing.",
+    "duration_ms": 3000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "orchestral crescendo",
+     "taiko roll",
+     "swelling strings",
+     "rising tension"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "vocals",
+     "silence"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "The biggest hit of the film on the first beat: a colossal cinematic impact, full orchestra and taiko together.\nThen a majestic, sustained resolution: warm brass and strings, bianzhong bells, a final shimmering ring-out.",
+    "duration_ms": 7000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "modern Chinese orchestral hybrid",
+     "colossal impact",
+     "majestic resolution",
+     "warm brass and strings",
+     "bianzhong bells",
+     "shimmering ring out"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "choir",
+     "vocals",
+     "drum loop"
+    ],
+    "context_adherence": "medium"
+   }
+  ]
+ }
+}

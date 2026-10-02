@@ -1,0 +1,9 @@
+[
+ {"film": [0.0, 14.0],  "src": "seedance/takes/c1_t1_noclaws.mp4", "from": [0.0, 14.0], "type": true},
+ {"film": [14.0, 17.5], "src": "seedance/takes/c2_t1.mp4",         "from": [0.0, 3.04], "type": true},
+ {"film": [17.5, 20.5], "src": "seedance/takes/carve_gold_t4.mp4", "from": [0.0, 3.0]},
+ {"film": [20.5, 24.0], "src": "seedance/takes/set_t2.mp4",        "map": [[0, 0.5], [2.0, 3.0], [3.5, 3.95]]},
+ {"film": [24.0, 25.5], "src": "seedance/takes/c3_t2.mp4",         "from": [3.5, 5.0]},
+ {"film": [25.5, 33.0], "src": "seedance/takes/c4_t1.mp4",         "from": [0.0, 7.5]},
+ {"film": [33.0, 40.0], "src": "feiyuehui-v4.mp4",                 "from": [33.0, 40.0]}
+]

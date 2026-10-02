@@ -1,0 +1,7 @@
+{
+ "name": "chime",
+ "text": "A single pure crystal chime, like a jade bell struck once, clear tone with a long gentle tail.",
+ "duration_seconds": 3.0,
+ "prompt_influence": 0.7,
+ "model_id": "eleven_text_to_sound_v2"
+}

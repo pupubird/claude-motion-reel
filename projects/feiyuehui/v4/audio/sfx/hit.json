@@ -1,0 +1,7 @@
+{
+ "name": "hit",
+ "text": "Deep warm cinematic impact with a bright metallic golden shimmer tail, elegant luxury logo hit.",
+ "duration_seconds": 2.2,
+ "prompt_influence": 0.65,
+ "model_id": "eleven_text_to_sound_v2"
+}

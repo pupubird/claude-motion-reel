@@ -1,0 +1,7 @@
+{
+ "name": "gleam",
+ "text": "A soft metallic gleam sweeping across gold foil, subtle shimmering glint.",
+ "duration_seconds": 1.2,
+ "prompt_influence": 0.6,
+ "model_id": "eleven_text_to_sound_v2"
+}

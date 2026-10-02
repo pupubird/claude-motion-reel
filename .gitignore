@@ -24,3 +24,21 @@ projects/novapitch/assets/vo/answer_*.json
 # local secrets (never commit)
 .env
 .env.*
+
+# 翡月荟 (reel 05): the client's images, mirrored from its site with the client's consent (2026-09-30), and everything
+# built from them stay local: the three.js package (shared/assets/3d), the logo traces (shared/assets/derived), the
+# Seedance takes and their reference photos (v4/out, ignored above). Only v4, the source of the released film, is
+# published; the earlier iterations (v1–v3, ~570 MB of fonts, textures and stems) and the shared production assets
+# (score and voice takes, hand-off notes) stay local too.
+projects/feiyuehui/shared/
+projects/feiyuehui/v1/
+projects/feiyuehui/v2/
+projects/feiyuehui/v3/
+# v4: tools/mix.py rebuilds the stems and the mix; of the score takes only c6 (the score) is kept; look-dev stills show
+# the client's pieces
+projects/feiyuehui/v4/audio/*.wav
+projects/feiyuehui/v4/audio/music/*
+!projects/feiyuehui/v4/audio/music/c6.mp3
+!projects/feiyuehui/v4/audio/music/c6.json
+projects/feiyuehui/v4/audio/**/*.log
+projects/feiyuehui/v4/lookdev/

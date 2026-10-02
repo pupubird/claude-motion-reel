@@ -1,0 +1,7 @@
+{
+ "name": "bangle",
+ "text": "A jade bangle spinning and gently ringing, clear resonant musical stone ring.",
+ "duration_seconds": 1.6,
+ "prompt_influence": 0.7,
+ "model_id": "eleven_text_to_sound_v2"
+}
