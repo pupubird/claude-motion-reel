@@ -70,7 +70,8 @@
   light and sound unchanged (loudness identical every second).
 - **v6.2, released (type in the scene, an iPhone-shaped phone, centred compositions):** English and Chinese 1080p
   masters, 1080×1920 60 fps, 3,960 frames each, 72.2 MB and 71.5 MB (16 samples, 3 workers: 1,035 s and 1,011 s); web
-  cuts 48.6 MB and 48.7 MB (two-pass 6 Mb/s); 4K masters at 2160×3840 (sizes and gates in the release notes). Frame gate
+  cuts 48.6 MB and 48.7 MB (two-pass 6 Mb/s); 4K masters at 2160×3840, 140.4 MB and 140.8 MB (3,455 s and 3,427 s), the
+  same gates passing on them (frame gate; jump gate with the designed knocks only), −14.0 LUFS, −1.0 dBTP. Frame gate
   PASS on both (mean luma 0.755–0.933; no flat, blown, dark or flipped frames); jump gate PASS on both with the release's
   designed knocks only (the Chinese cut's near miss at 9.88 s is the lens riding the finger to the second tag); colour
   check PASS. Reading: English 86 strings, 4 under 80 % of the guide (the "Pick 3" counter, as released); Chinese 83, 5
