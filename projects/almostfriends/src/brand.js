@@ -1,4 +1,5 @@
 import { cubicBezier } from './util.js';
+import { LANG, T } from './copy.js';
 // almost friends — brand tokens. Direction A, "Outside Your Bubble" (research/research-vibe.md §4–5): a daylight
 // sky, white UI, iridescent film accents; ink on light only. Contrast pairs from the vibe report (WCAG 2.2).
 export const C = {
@@ -16,10 +17,14 @@ export const BG = C.sky;
 export const INK = C.ink;
 
 // Display: Bricolage Grotesque (opsz 12–96, wght 200–800, wdth 75–100). UI: Figtree (stands in for the system font
-// in the mock app). Emoji from Noto Color Emoji (COLRv1). All SIL OFL 1.1.
+// in the mock app). Emoji from Noto Color Emoji (COLRv1). Chinese (the zh cut): Noto Sans SC, the Source Han Sans
+// design, variable 100–900, so every weight the film asks for is drawn, never synthesised; it follows the emoji face
+// in the stack because it carries monochrome emoji of its own. Latin, digits and the brand keep their faces in every
+// cut. All SIL OFL 1.1.
+const HAN = LANG === 'en' ? '' : ', "Noto Sans SC Variable"';
 export const FONTS = {
-  display: '"Bricolage Grotesque", "Noto Color Emoji"',
-  ui: '"Figtree", "Noto Color Emoji"',
+  display: `"Bricolage Grotesque", "Noto Color Emoji"${HAN}`,
+  ui: `"Figtree", "Noto Color Emoji"${HAN}`,
 };
 
 // The mock app's UI tokens (light mode, iOS 26 grammar: research/research-ui.md §4)
@@ -32,12 +37,12 @@ export const UI = {
 // Six life priorities, one hue each, used everywhere the priority appears (chips, orbs, rings, the crowd, the circle).
 // `text` is the label colour that clears 4.5:1 on the fill.
 export const P = {
-  family: { label: 'Family', emoji: '\u{1F468}‍\u{1F469}‍\u{1F467}', color: '#FF7A59', text: C.ink },
-  career: { label: 'Career', emoji: '\u{1F4BC}', color: '#3B6CFF', text: '#FFFFFF' },
-  wealth: { label: 'Wealth', emoji: '\u{1F4B0}', color: '#17B890', text: C.ink },
-  health: { label: 'Health', emoji: '\u{1F4AA}', color: '#FF6FAE', text: C.ink },
-  learning: { label: 'Learning', emoji: '\u{1F4DA}', color: '#1FB5E5', text: C.ink },   // v4: was Faith (Malaysia's Content Code §8.7 keeps religion out of ads; its violet read as "AI purple")
-  adventure: { label: 'Adventure', emoji: '\u{1F3D4}️', color: '#FFB224', text: C.ink },
+  family: { label: T.priority.family, emoji: '\u{1F468}‍\u{1F469}‍\u{1F467}', color: '#FF7A59', text: C.ink },
+  career: { label: T.priority.career, emoji: '\u{1F4BC}', color: '#3B6CFF', text: '#FFFFFF' },
+  wealth: { label: T.priority.wealth, emoji: '\u{1F4B0}', color: '#17B890', text: C.ink },
+  health: { label: T.priority.health, emoji: '\u{1F4AA}', color: '#FF6FAE', text: C.ink },
+  learning: { label: T.priority.learning, emoji: '\u{1F4DA}', color: '#1FB5E5', text: C.ink },   // v4: was Faith (Malaysia's Content Code §8.7 keeps religion out of ads; its violet read as "AI purple")
+  adventure: { label: T.priority.adventure, emoji: '\u{1F3D4}️', color: '#FFB224', text: C.ink },
 };
 export const PKEYS = Object.keys(P);
 

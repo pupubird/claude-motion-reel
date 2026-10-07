@@ -5,6 +5,9 @@ import { FONTS, SPRING } from './brand.js';
 import { clamp, spring, springVel } from './util.js';
 
 const mctx = document.createElement('canvas').getContext('2d');
+// Chinese and Japanese: Han, kana, CJK punctuation, full-width forms
+export const CJK = /[\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF00-\uFFEF]/u;
+const ZW = '\u200B';                        // a word boundary that is never drawn (copy.js)
 
 export function setFont(ctx, { f = FONTS.display, w = 700, s = 100, track = 0, stretch = 'normal' } = {}) {
   ctx.font = `${Math.round(w)} ${s}px ${f}`;
@@ -16,6 +19,11 @@ export function setFont(ctx, { f = FONTS.display, w = 700, s = 100, track = 0, s
 
 export class Line {
   constructor(text, opt = {}) {
+    // zero-width spaces only mark where words pop: they are dropped before anything is measured
+    const cuts = new Set();
+    let clean = '';
+    for (const ch of text) { if (ch === ZW) cuts.add([...clean].length); else clean += ch; }
+    text = clean;
     this.text = text;
     this.opt = { f: FONTS.display, w: 700, s: 110, track: -0.02, ...opt };
     setFont(mctx, this.opt);
@@ -29,13 +37,26 @@ export class Line {
     }
     // trailing letter-spacing is not ink: drop one tracking unit from the measured width
     this.width = mctx.measureText(text).width - this.opt.track * this.opt.s;
+    this.lead = 0;
     this.ascent = mctx.measureText('H').actualBoundingBoxAscent;
     this.xh = mctx.measureText('x').actualBoundingBoxAscent;
     this.descent = mctx.measureText('gy').actualBoundingBoxDescent;
+    if (CJK.test(text)) {
+      // Chinese is set by its ink: an ideograph fills the em box (taller than a capital, so it scales about its own
+      // centre, not an x-height), and full-width punctuation carries a blank half-em (a trailing 。 would push a
+      // centred line left), so a line is centred on the ink it actually draws
+      const ink = mctx.measureText(text), han = mctx.measureText('国');
+      this.ascent = Math.max(this.ascent, han.actualBoundingBoxAscent);
+      this.xh = han.actualBoundingBoxAscent - han.actualBoundingBoxDescent;
+      this.descent = Math.max(this.descent, han.actualBoundingBoxDescent);
+      this.lead = -ink.actualBoundingBoxLeft;
+      this.width = ink.actualBoundingBoxRight + ink.actualBoundingBoxLeft;
+    }
     this.words = [];
     let st = 0;
     chars.forEach((ch, i) => {
       if (ch === ' ') { if (i > st) this.words.push(this.#word(st, i)); st = i + 1; }
+      else if (cuts.has(i) && i > st) { this.words.push(this.#word(st, i)); st = i; }
     });
     if (st < chars.length) this.words.push(this.#word(st, chars.length));
   }
@@ -81,7 +102,7 @@ export function drawLine(ctx, line, x, y, { fill = '#000', each = null, log = tr
   });
 }
 
-export const centerX = (line, cx) => cx - line.width / 2;
+export const centerX = (line, cx) => cx - line.width / 2 - line.lead;
 
 // Spring pop per word: word k is released at at[k]; it scales up from 0 with the spring's overshoot and squashes
 // along its motion (stretch tall while it grows fast, settle round).
@@ -133,6 +154,7 @@ export function combine(...fns) {
 // Wrap a string into lines no wider than maxW at the given font options.
 export function wrap(s, maxW, opt) {
   setFont(mctx, opt);
+  if (CJK.test(s)) return wrapHan(s, maxW);
   const words = s.split(' ');
   const lines = [];
   let cur = '';
@@ -141,6 +163,27 @@ export function wrap(s, maxW, opt) {
     if (mctx.measureText(t2).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t2;
   }
   if (cur) lines.push(cur);
+  return lines;
+}
+
+// Chinese has no spaces: it breaks between words (ICU's dictionary segmentation, so 朋友 never splits), never before
+// closing punctuation or after an opening one (kinsoku), and a line never starts or ends with a space
+const NO_START = /^[，。、！？；：）」』》〉】”’!?,.;:)\]…·]/u, NO_END = /[（「『《〈【“‘(\[]$/u;
+const SEG = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh-Hans', { granularity: 'word' }) : null;
+function wrapHan(s, maxW) {
+  if (!SEG) throw new Error('type: Intl.Segmenter is needed to wrap Chinese');
+  if (s.includes('\n')) return s.split('\n').flatMap((p) => wrapHan(p, maxW));     // the writer's own breaks
+  const units = [];
+  for (const { segment } of SEG.segment(s)) {
+    if (units.length && (NO_START.test(segment) || NO_END.test(units[units.length - 1]))) units[units.length - 1] += segment;
+    else units.push(segment);
+  }
+  const lines = [];
+  let cur = '';
+  for (const u of units) {
+    if (cur && mctx.measureText((cur + u).trimEnd()).width > maxW) { lines.push(cur.trimEnd()); cur = u.trimStart(); } else cur += u;
+  }
+  if (cur.trim()) lines.push(cur.trimEnd());
   return lines;
 }
 

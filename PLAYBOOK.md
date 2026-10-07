@@ -91,6 +91,23 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 - Plain, human, in the viewer's own words; none of the category's worn phrases. [06]
 - Say the positive ("Friendship is the whole point."), not the disclaimer ("not dating"). [06]
 
+## Other languages
+
+- A second language is the same film: the same picture, timing and score. Only the words change, and they are
+  adapted into the viewer's own idiom, not translated word for word (三观一致 for "share your values"; 圈子 for the
+  social "bubble"). [06]
+- The brand keeps its own script in every cut. A hero word can hand over to it on screen: 朋友 flips into
+  "friends". [06]
+- "Font must be great": a real face for the script, with real weights (Noto Sans SC, variable 100–900). Latin and
+  digits stay in the film's Latin faces. Never a system fallback or a synthesised bold, and licensed so the repo can
+  ship it. [06]
+- Set each script by its own metrics, measured in the font: Han ink rises 0.81–0.87 em against 0.70 for a capital.
+  Centre lines on their ink, lead Han display lines at about 1.14, and re-space anything stacked (badges, hero
+  words). [06]
+- Punctuation and line breaks are typography: full-width in Chinese, half-width where a full-width form leaves a gap,
+  breaks between words (ICU) with kinsoku, and the writer's own break where an idiom would split. [06]
+- Reading time per script: 0.23 s a Chinese character (260 a minute) against 0.375 s an English word. [06]
+
 ## Process
 
 1. Research first, in parallel, into sourced reports (market, UI, vibe, sound, naming; hooks for openings).
@@ -112,3 +129,6 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 - A failed render must not leave gigabytes of intermediates behind; clean up with `find … -delete`, not a bare glob.
 - Secrets live in git-ignored `.env` files and are never printed; test for a key with `grep -q`, never `grep -c`.
 - Shared GPU state has one source of truth.
+- Words live in one table per cut, with the same shape checked at load. Before a new cut is judged, prove the
+  original unchanged: a pixel diff against a second render of the same code (run-to-run noise is real), and its cue
+  sheet byte-identical. [06]

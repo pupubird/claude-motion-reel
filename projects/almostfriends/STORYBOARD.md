@@ -1,4 +1,4 @@
-# almost friends — storyboard v6 (reel 06), locked and released
+# almost friends — storyboard v6 (reel 06), locked and released, with a Chinese cut
 
 **The app.** You tell an AI what matters most in your life (family, wealth, career…). It finds people who put the
 same things first. You chat anonymously for 3 days — no names, no photos. Only if you **both** tap Unlock do you see
@@ -51,8 +51,9 @@ both unlock, "almost" pops and you're friends.
 - **Social safe band:** caption text inside y 288–520; everything tapped or read in the app inside y 620–1248. The
   phone rises with the conversation (`LIFT` in `src/scenes/howto.js`) and fades into the sky above y 610.
 - **Reading time:** 0.5 s + 0.375 s a word as a guide (`tools/check_reading.mjs`); flexible for labels.
-- **No cuts:** screens change with iOS pushes; the app opens out of its icon; the phone pulls back and comes forward
-  (`tools/check_jumps.py` passes with one designed jump, the pop).
+- **No cuts:** screens change with iOS pushes; the app opens out of its icon; the phone pulls back and comes forward.
+  `tools/check_jumps.py` passes with only its designed hits: the knocks, and the sky turning to the next dawn on each
+  day's tick.
 - **Not dating, by construction:** no hearts, no couples framing, no "It's a match"; groups and foam. (v4, owner: no
   need to say "not dates" either.)
 - **People** are ordinary, casual iPhone snapshots (owner's rule) — never models.
@@ -119,11 +120,75 @@ friend in a setting that says a comfortable life (travel, sport, cafés, rooftop
 - Prompts: `assets/people/prompts-v6.tsv`; generation `tools/gen_people.py`; face crops `assets/people/crops.json`
   (`tools/face_crops.py`). Sofia's portrait was upscaled to 2k for the 4K master. Earlier casts stay local.
 
+## The Chinese cut (中文版)
+
+![The Chinese cut: the hook, the reveal, the circle of friends](docs/poster-zh.jpg)
+
+The owner, after the lock: "做个中文版的, font must be great". The Chinese cut is the same film: the same picture, the
+same timing to the frame, the same score. Only the words change, and they are adapted, not translated word for word.
+Simplified Chinese, spoken and young, in the viewer's own idiom. All of it lives in one table, `src/copy.js`. The
+English and Chinese tables must have the same shape: a missing line throws at load, so the cut can never ship
+half-translated. Build it with `?lang=zh` (`npm run af:audio:zh`, `af:render:zh`, `af:check:zh`, `af:read:zh`).
+
+**The type.**
+- **Font: Noto Sans SC (Source Han Sans SC).** The Source Han Sans design, under SIL OFL, so it can ship in the
+  repo. Variable 100–900, so the film's heavy display weights (790–820) and its UI weights (500–750) are real cuts,
+  never synthesised bold.
+- **Latin stays in Latin faces.** Latin letters and digits keep Bricolage Grotesque and Figtree, the film's own
+  faces, so "AI", "TA", "Bub" and "3" match the English cut.
+- **Chinese is set by its ink.** Measured in the font, a Han character's ink rises 0.81–0.87 em; a Latin capital rises
+  0.70. So:
+  - **Hook:** re-spaced to 128 / 128 / 248 px, with 朋友 exactly as wide as 交到更多, between the safe zone's top
+    and Bub.
+  - **Captions:** they hang from the step badge by their ink, with lines led at 1.14.
+  - **Centring:** every line is centred on its ink. A trailing 。 or ？ carries a blank half-em, which would push a
+    centred line to the left.
+- **Punctuation and line breaks.**
+  - Full-width punctuation throughout.
+  - Casual chat types "!!" and "??" half-width, as people do. Noto Sans SC's full-width ！ also sits at the left of a
+    whole em, which would leave gaps.
+  - Chat bubbles break between words (ICU segmentation), never before closing punctuation.
+  - The writer can force a break, so the idiom 雷打不动 never splits.
+- **The hero word.** 朋友 survives the pop like "friends" does, glides into its place in the name, and flips into
+  "friends" like a split-flap (0.16 s, a click as it folds flat). The name translates itself.
+- **The brand stays Latin:** almost / friends.ai, Bub, the AI tag, and the "almost → friends" punchline.
+
+**The words.**
+
+| Beat | English | 中文 | Why |
+|---|---|---|---|
+| Hook | How to / make more / friends | 怎么 / 交到更多 / 朋友 | The question as people type it |
+| Value | New friends who share your values. | 认识 / 三观一致的 / 新朋友。 | 三观一致 is how young Chinese speakers say "shares my values" |
+| Priorities | Family · Wealth · Career · Health · Learning · Adventure | 家庭 · 财富 · 事业 · 健康 · 学习 · 冒险 | |
+| Step 1 | Pick what matters to you | 选出 / 你最在乎的 | |
+| Step 2 | AI finds people who share them | AI 帮你找到 / 志同道合的人 | 志同道合: an idiom for people who share your aims |
+| Step 3 | Chat anonymously for 3 days | 先匿名 / 聊 3 天 | 先 ("first") promises the unlock to come |
+| | No names. No photos. Just talk anonymously. | 不看名字，不看照片。/ 只看聊不聊得来。 | 不看 · 不看 · 只看: one rhythm; 聊得来 = "we click" |
+| Step 4 | It takes two yeses. | 要两个人 / 都点头。 | A nod is consent, and it is visual |
+| The search | Wealth first · Health first · Family first | 财富第一 · 健康第一 · 家庭第一 | |
+| The match | Family first? So are they. | 家庭第一？TA 也是。 | TA: the written, gender-neutral pronoun |
+| The chat | WAIT. Same!! · SAME!! | 等等，我也是!! · 我也是!! | |
+| | Sunday dinner at my mum's. Non-negotiable 😂 | 每周日都回我妈家吃饭，雷打不动 😂 | 雷打不动: "not even thunder moves it" |
+| | ok we're trading dumpling recipes | 行，那必须交换饺子秘方了 | 秘方: a family's secret recipe |
+| The sheet | 3 days in. Ready to meet properly? | 3 天到了。要正式认识一下吗？ | |
+| | Nothing is shown unless you both unlock. | 两个人都解锁，才会看到彼此。 | |
+| The reveal | You're both in! | 双双解锁！ | |
+| The circle | Same values. New friends. | 三观一致。新朋友。 | |
+| | Friendship is the whole point. | 纯友谊，才是重点。 | 纯友谊 ("pure friendship") says "not dating" positively |
+| End card | Make friends outside your bubble. | 走出圈子，交新朋友。 | 圈子 ("circle") is the social sense of "bubble" in Chinese |
+
+The anonymous handle is 好奇水獭 (Curious Otter); names read "Hana，26岁". The rest of the thread is in `src/copy.js`.
+
+**The sound.** The same score and the same mix. The cue sheet follows the cut's own words: the value clicks once per
+Chinese phrase (4, not 6), "双双 · 解锁！" lands with two clicks (not three), and the flip of 朋友 gets its own click
+(`audio/cues-zh.json` → `foley-zh.wav` → `mix-zh.wav`).
+
 ## Decided at lock (v6)
 
 1. The cut: v6, 66 s, locked by the owner and released as a 1080p master, a 4K master and a web encode.
 2. "Learning" replaces "Faith" among the six priorities (Malaysia's Content Code §8.7; Faith's violet read as "AI
    purple").
+3. The Chinese cut (中文版): the same film with adapted words and Noto Sans SC, rendered from the same code (`?lang=zh`).
 
 ## Open after the release
 

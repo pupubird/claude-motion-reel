@@ -3,6 +3,7 @@
 // hanging the render (the cast is generated separately).
 import { loadIcons } from './ui/icons.js';
 import { S as S_DPR } from './config.js';
+import { T, fill } from './copy.js';
 const base = new URL('../assets/', import.meta.url);
 export const IMG = {};
 
@@ -21,7 +22,7 @@ export function img(src) {
 export const PEOPLE = {};
 // the two of you, by role (unlock.js's reveal, foam.js's double bubble): "you" and "the one" (Curious Otter)
 export const LEADS = { you: 'hana', one: 'sofia' };
-export const NAMES = { hana: 'Hana, 26', sofia: 'Sofia, 28' };
+export const NAMES = { hana: fill(T.nameAge, { name: 'Hana', age: 26 }), sofia: fill(T.nameAge, { name: 'Sofia', age: 28 }) };
 // everyone else who becomes your friend (foam.js), in crops.json order: the first six take the inner ring
 export const CROWD = [];
 

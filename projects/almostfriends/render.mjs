@@ -7,6 +7,7 @@
 //   node projects/<film>/render.mjs --scale=2                         2160×3840 master
 //   node projects/<film>/render.mjs --wav=projects/<film>/audio/mix.wav   mux a soundtrack
 //   node projects/<film>/render.mjs --scenes=hook,chat --q='debug=1'  only these scenes; raw query knobs pass through
+//   node projects/<film>/render.mjs --lang=zh                         the Chinese cut (src/copy.js)
 //   node projects/<film>/render.mjs --gpu                             print the WebGL renderer string and exit
 import fs from 'node:fs';
 import path from 'node:path';
@@ -32,6 +33,7 @@ const outFile = path.resolve(ROOT, args.out ?? path.join(path.relative(ROOT, OUT
 const server = await serveFilm();
 const q = { mode: 'render', scale: String(SCALE) };
 if (args.scenes) q.scenes = args.scenes;
+if (args.lang) q.lang = args.lang;
 const url = server.url(q) + (args.q ? `&${args.q}` : '');
 const browser = await launchChrome();
 let pageErrors = 0;

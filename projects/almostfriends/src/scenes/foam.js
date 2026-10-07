@@ -14,6 +14,7 @@
 import { W, H } from '../config.js';
 import { C, FONTS, P, SPRING, MOVE } from '../brand.js';
 import { FOAM, MARK, GROW } from '../score.js';
+import { T } from '../copy.js';
 import { clamp, lerp, seg, ease, spring, rng, TAU, rgba } from '../util.js';
 import { drawSky } from '../world/sky.js';
 import { drawBubble2D, drawBubFace } from '../world/bubble2d.js';
@@ -83,13 +84,13 @@ let same1, same2, point1, point2, nameA, nameF, tag;
 
 export default {
   init() {
-    same1 = new Line('Same values.', { s: 112, w: 780, track: -0.03 });
-    same2 = new Line('New friends.', { s: 112, w: 800, track: -0.03 });
-    point1 = new Line('Friendship is', { s: 92, w: 700, track: -0.025 });
-    point2 = new Line('the whole point.', { s: 92, w: 700, track: -0.025 });
+    same1 = new Line(T.foam.same[0], { s: 112, w: 780, track: -0.03 });
+    same2 = new Line(T.foam.same[1], { s: 112, w: 800, track: -0.03 });
+    point1 = new Line(T.foam.point[0], { s: 92, w: 700, track: -0.025 });
+    point2 = new Line(T.foam.point[1], { s: 92, w: 700, track: -0.025 });
     nameA = new Line('almost', { s: 150, w: 640, track: -0.02 });
     nameF = new Line('friends.ai', { s: 150, w: 800, track: -0.035 });
-    tag = new Line('Make friends outside your bubble.', { s: 50, w: 600, f: FONTS.ui, track: -0.005 });
+    tag = new Line(T.foam.tag, { s: 50, w: 600, f: FONTS.ui, track: -0.005 });
   },
   under: [{ start: FOAM.in - 0.6, end: MARK.end, draw(ctx) { drawSky(ctx); } }],
   layers: [{

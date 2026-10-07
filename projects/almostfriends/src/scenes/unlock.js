@@ -9,6 +9,7 @@
 import { W, H } from '../config.js';
 import { C, FONTS, UI, P, PKEYS, SPRING, MOVE } from '../brand.js';
 import { UNLOCK, FOAM } from '../score.js';
+import { T, fill } from '../copy.js';
 import { clamp, lerp, seg, ease, spring, TAU, rgba } from '../util.js';
 import { drawSky } from '../world/sky.js';
 import { drawBubble2D, drawBubFace, drawColorOrb, blinkAt } from '../world/bubble2d.js';
@@ -28,7 +29,7 @@ import { universe, PATH, hideHeroes } from '../gl/universe.js';
 const pt = (v) => v * K;
 const S = LAYOUT.sheet;
 const SHEET = { x: pt(8), y: S.y, w: W - pt(16), h: pt(376) };
-const SLOT = [{ x: W / 2 - S.slotDX, name: 'You', colors: YOU_COLORS, seed: 1.3 }, { x: W / 2 + S.slotDX, name: 'Curious Otter', colors: OTTER_COLORS, seed: 4.1 }];
+const SLOT = [{ x: W / 2 - S.slotDX, name: T.you, colors: YOU_COLORS, seed: 1.3 }, { x: W / 2 + S.slotDX, name: T.otter, colors: OTTER_COLORS, seed: 4.1 }];
 // where the two faces end up (foam.js picks them up from here)
 export const REVEAL = { y: 840, r: 220, gap: 480 };
 const KISS = { y: 820, r: 190 };
@@ -38,7 +39,7 @@ const drops = burst(53, 80, { speed: [700, 2000], spread: TAU, size: [8, 18] });
 
 export default {
   init(env) {
-    both = new Line('You’re both in!', { s: 118, w: 800, track: -0.03 });
+    both = new Line(T.both, { s: 118, w: 800, track: -0.03 });
     almost = new Line('almost', { s: 170, w: 640, track: -0.02 });
     friends = new Line('friends', { s: 190, w: 800, track: -0.035 });   // the sentence: almost friends → friends (no .ai here)
     U = universe(env, UNIVERSE_CAST);
@@ -108,8 +109,8 @@ export function unlockScreen(ctx, t, view) {
   ctx.restore();
   ctx.fillStyle = 'rgba(11,27,63,0.16)';
   ctx.fill(squirclePath(W / 2 - pt(18), SHEET.y + pt(8), pt(36), pt(5), pt(2.5)));
-  text(ctx, '3 days in.', W / 2, SHEET.y + pt(52), { f: FONTS.ui, w: 800, size: pt(22), color: UI.ink, align: 'center' });
-  text(ctx, 'Ready to meet properly?', W / 2, SHEET.y + pt(78), { f: FONTS.ui, w: 500, size: pt(17), color: UI.ink2, align: 'center' });
+  text(ctx, T.sheet.title, W / 2, SHEET.y + pt(52), { f: FONTS.ui, w: 800, size: pt(22), color: UI.ink, align: 'center' });
+  text(ctx, T.sheet.ask, W / 2, SHEET.y + pt(78), { f: FONTS.ui, w: 500, size: pt(17), color: UI.ink2, align: 'center' });
   const youOpen = spring(t - UNLOCK.tap - 0.2, SPRING.pop), themOpen = spring(t - UNLOCK.open - 0.3, SPRING.pop);
   SLOT.forEach((s, i) => {
     const open = i === 0 ? youOpen : themOpen;
@@ -161,10 +162,10 @@ export function unlockScreen(ctx, t, view) {
   about(ctx, W / 2, by + bh / 2, press, press, () => {
     ctx.fillStyle = waitingB && t < UNLOCK.open ? '#EEF1F8' : C.gold;
     ctx.fill(squirclePath(bx, by, bw, bh, bh / 2));
-    const label = t >= UNLOCK.open ? 'You’re both in!' : waitingB ? 'Waiting for Curious Otter…' : 'Unlock';
+    const label = t >= UNLOCK.open ? T.both.replace(/\u200B/g, '') : waitingB ? fill(T.sheet.waiting, { who: T.otter }) : T.sheet.unlock;
     text(ctx, label, W / 2, by + bh / 2 + pt(6), { f: FONTS.ui, w: 750, size: pt(17), color: waitingB && t < UNLOCK.open ? UI.ink2 : C.ink, align: 'center' });
   });
-  text(ctx, 'Nothing is shown unless you both unlock.', W / 2, by + bh + pt(28), { f: FONTS.ui, w: 500, size: pt(13), color: UI.ink3, align: 'center' });
+  text(ctx, T.sheet.note, W / 2, by + bh + pt(28), { f: FONTS.ui, w: 500, size: pt(13), color: UI.ink3, align: 'center' });
   const fu = (t - UNLOCK.tap + 0.1) / 0.36;
   if (fu > 0 && fu < 1) {
     ctx.save(); ctx.globalAlpha *= Math.sin(fu * Math.PI) * 0.32;
@@ -314,7 +315,7 @@ function reveal(ctx, t) {
     }
     const cp = spring(t - UNLOCK.names - 0.3, SPRING.pop);
     if (cp > 0.001) {
-      const chip = `${P.family.emoji}  Family first · ${P.adventure.emoji}  Adventure`;
+      const chip = `${P.family.emoji}  ${fill(T.first, { p: P.family.label })} · ${P.adventure.emoji}  ${P.adventure.label}`;
       const cw = measure(ctx, chip, { f: FONTS.ui, w: 700, size: 38 }) + 64, cy = y + REVEAL.r + 134;
       about(ctx, W / 2, cy + 38, cp, cp, () => {
         ctx.fillStyle = '#FFFFFF';

@@ -11,14 +11,16 @@
 //        magenta → gold; 1.25 a black spot blooms, Bub's eyes go huge; 1.6 the film trembles, it shuts its eyes
 //   2.0  the drop: the wall tears from the spot, Bub bursts through past the lens, colour floods the world. "How to make
 //        more" flies apart with the film; "friends" survives and glides down into the name as the droplets inflate into
-//        the mark — two soap bubbles, blue and coral, kissing (3D): almost / friends.ai
+//        the mark — two soap bubbles, blue and coral, kissing (3D): almost / friends.ai. In the Chinese cut the hero
+//        word is 朋友: it glides into the same place and flips into "friends", the name translating itself
 //   3.15 the camera dives through the mark (blue, the wall, coral: a colour wipe) onto the value, alone and big, held
 //        while the world of people glides by: "New friends who share your values."
 //   6.75 the app icon pops in; Bub dives into it (the tap) and the app opens (howto.js)
 import * as THREE from 'three';
 import { W, H } from '../config.js';
 import { C, P, FONTS, SPRING, MOVE } from '../brand.js';
-import { HOOK, NAME } from '../score.js';
+import { HOOK, NAME, valuePops } from '../score.js';
+import { T } from '../copy.js';
 import { clamp, lerp, seg, ease, spring, springVel, smoothstep, TAU, mixHex } from '../util.js';
 import { drawSky } from '../world/sky.js';
 import { APP_ICON, drawMark, ICON_RADIUS } from '../world/mark.js';
@@ -41,13 +43,15 @@ const MARK_R = 0.36;                                // each of the mark's bubble
 const BUB_R = 0.25;                                 // Bub, at the wall
 const CONTACT_Y = 1015;                             // where Bub meets the wall on screen (px)
 const VALUE_TAGS = NAME.value + 1.2;                // the value's three tags pop in (tools/cues.mjs: the same)
-const Y_HOW = 330, Y_MAKE = 490, Y_FRIENDS = 735;   // the hook's three lines (baselines)
+const [Y_HOW, Y_MAKE, Y_FRIENDS] = T.hook.y;        // the hook's three lines (baselines; copy.js, per cut)
 const Y_ALMOST = 1390, Y_NAME = 1535;               // the name: almost / friends.ai
 const KNOCKS = [HOOK.knock1, HOOK.knock2, HOOK.knock3];
 const lastKnock = (t) => KNOCKS.reduce((a, k) => (k <= t ? k : a), KNOCKS[0]);
 // "friends" survives the pop and glides into the name: [start, end, stagger per letter] (s)
 const CARRY = [HOOK.pop + 0.04, NAME.name + 0.1, 0.005];
 const CARRY_END = CARRY[1] + 6 * CARRY[2];
+// a hero word that is not the name's own (朋友) lands, then flips into it over this long, ending at CARRY_END
+const FLIP = 0.16;
 
 let scene, camera, PL, BUB, MK, MB, howTo, makeMore, bigF, almost, friendsAi, v1, v2, v3;
 const drops = burst(23, 140, { speed: [800, 2400], spread: TAU, size: [8, 22] });
@@ -158,14 +162,13 @@ export default {
     MB = membrane();
     scene.add(MB.mesh);
     camera = new THREE.PerspectiveCamera(64, W / H, 0.02, 400);
-    howTo = new Line('How to', { s: 150, w: 800, track: -0.035 });
-    makeMore = new Line('make more', { s: 150, w: 800, track: -0.035 });
-    bigF = new Line('friends', { s: 240, w: 800, track: -0.03 });     // same weight and tracking as the name's: carried()
+    const [h1, h2, h3] = T.hook.lines, [s1, s2, s3] = T.hook.s;
+    howTo = new Line(h1, { s: s1, w: 800, track: -0.035 });
+    makeMore = new Line(h2, { s: s2, w: 800, track: -0.035 });
+    bigF = new Line(h3, { s: s3, w: 800, track: -0.03 });     // same weight and tracking as the name's: carried()
     almost = new Line('almost', { s: 150, w: 640, track: -0.015 });
     friendsAi = new Line('friends.ai', { s: 150, w: 800, track: -0.03 });
-    v1 = new Line('New friends', { s: 150, w: 800, track: -0.035 });
-    v2 = new Line('who share', { s: 150, w: 800, track: -0.035 });
-    v3 = new Line('your values.', { s: 150, w: 820, track: -0.035 });
+    [v1, v2, v3] = T.value.lines.map((l, i) => new Line(l, { s: 150, w: i === 2 ? 820 : 800, track: -0.035 }));
   },
 
   three: {
@@ -323,6 +326,7 @@ function hookWords(ctx, t) {
 // going from blue to ink, a little after the one before it; nameWords() takes over, letter for letter, at CARRY_END
 function carried(ctx, t) {
   if (t < HOOK.pop || t >= CARRY_END) return;
+  if (!friendsAi.text.startsWith(bigF.text)) return flipped(ctx, t);
   const x0 = centerX(bigF, W / 2), x1 = centerX(friendsAi, W / 2), k = friendsAi.opt.s / bigF.opt.s;
   drawLine(ctx, bigF, x0, Y_FRIENDS, {
     fill: C.blue,
@@ -335,6 +339,27 @@ function carried(ctx, t) {
       return { dx: dx * p, dy: dy * p, sc: lerp(1, k, p) * (1 + flinch), fill: mixHex(C.blue, C.ink, p) };
     },
   });
+}
+
+// The Chinese cut: 朋友 glides down whole into the place of "friends" (shrinking to its height, blue to ink, the same
+// shockwave flinch), then flips into it like a split-flap: 朋友 folds flat about its middle as "friends" unfolds from
+// it, landing exactly at CARRY_END, where nameWords() takes over and ".ai" pops on
+function flipped(ctx, t) {
+  const word = friendsAi.glyphs.slice(0, 7), wx0 = word[0].x, wx1 = word[6].x + word[6].w;
+  const x1 = centerX(friendsAi, W / 2), cx1 = x1 + (wx0 + wx1) / 2;
+  const cy0 = Y_FRIENDS - bigF.xh / 2, cy1 = Y_NAME - friendsAi.xh / 2;
+  const k = friendsAi.ascent / bigF.ascent;                       // 朋友 lands as tall as "friends"' capitals
+  const p = MOVE.go(seg(t, CARRY[0], CARRY_END - FLIP));
+  const f = seg(t, CARRY_END - FLIP, CARRY_END);                   // the flip: 0 → 1
+  const flinch = 0.06 * Math.sin(Math.PI * seg(t, HOOK.pop, CARRY[0] + 0.05));
+  const cx = lerp(W / 2, cx1, p), cy = lerp(cy0, cy1, p);
+  if (f < 0.5) {
+    const sy = Math.cos(Math.PI * f), sc = lerp(1, k, p) * (1 + flinch);
+    about(ctx, cx, cy, sc, sc * sy, () => drawLine(ctx, bigF, centerX(bigF, cx), cy + bigF.xh / 2, { fill: mixHex(C.blue, C.ink, p), log: false }));
+  } else {
+    const sy = -Math.cos(Math.PI * f);
+    about(ctx, cx1, cy1, 1, sy, () => drawLine(ctx, friendsAi, x1, Y_NAME, { fill: C.ink, each: (i) => (i < 7 ? null : { a: 0 }), log: false }));
+  }
 }
 
 // the tear in 2D: droplets thrown from the spot toward the lens (they streak), a shockwave
@@ -388,10 +413,8 @@ function valueWords(ctx, t) {
     const o = seg(t, NAME.exit - 0.2 + Math.max(0, wk) * 0.03, NAME.exit - 0.2 + Math.max(0, wk) * 0.03 + 0.18, MOVE.out);
     return o > 0 ? { a: 1 - o, dy: -o * 90 } : null;
   };
-  const w0 = NAME.value + 0.04;
-  drawLine(ctx, v1, centerX(v1, W / 2), 760, { fill: C.ink, each: combine(popEach(v1, t, [w0, w0 + 0.1]), vOut) });
-  drawLine(ctx, v2, centerX(v2, W / 2), 915, { fill: C.ink, each: combine(popEach(v2, t, [w0 + 0.2, w0 + 0.3]), vOut) });
-  drawLine(ctx, v3, centerX(v3, W / 2), 1070, { fill: C.blue, each: combine(popEach(v3, t, [w0 + 0.42, w0 + 0.54]), vOut) });
+  const at = valuePops([v1, v2, v3].map((l) => l.words.length));
+  [[v1, 760], [v2, 915], [v3, 1070]].forEach(([l, y], i) => drawLine(ctx, l, centerX(l, W / 2), y, { fill: i === T.value.blue ? C.blue : C.ink, each: combine(popEach(l, t, at[i]), vOut) }));
 }
 
 // three of the values, as the app's own tags, popping in under the line (they come back in step 1)

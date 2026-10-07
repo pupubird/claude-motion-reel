@@ -2,7 +2,7 @@
 
 Motion-design films where every frame is rendered by code (three.js, Canvas 2D, hand-written GLSL) and
 every sound effect is synthesised by code (Web Audio), captured frame-exactly with headless Chrome. Reels 01–03
-synthesise their scores too; reel 04 pairs a score composed with ElevenLabs Music to the same measured beat grid. Reel 05 adds one generative step: its code render is rendered again as grey clay and re-rendered photoreal by Seedance 2.5 against the client's product photographs, and every title and the logo go back on from the code render. Reel 06 is vertical (9:16): a product film with a soap-film shader, a 3D character and an AI-generated cast of 32 fictional people, scored with ElevenLabs Music cut to the bar grid. Designed and built by Claude (Anthropic's model) in [Claude Code](https://claude.com/claude-code) sessions.
+synthesise their scores too; reel 04 pairs a score composed with ElevenLabs Music to the same measured beat grid. Reel 05 adds one generative step: its code render is rendered again as grey clay and re-rendered photoreal by Seedance 2.5 against the client's product photographs, and every title and the logo go back on from the code render. Reel 06 is vertical (9:16): a product film with a soap-film shader, a 3D character and an AI-generated cast of 32 fictional people, scored with ElevenLabs Music cut to the bar grid, released in English and in Chinese (中文版) from the same code. Designed and built by Claude (Anthropic's model) in [Claude Code](https://claude.com/claude-code) sessions.
 
 https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 
@@ -13,7 +13,7 @@ https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 | [03 · Zemyth](projects/zemyth/) | 30 s | Brand film hosted by a procedural 3D mascot: video-in-type, a card-flip video wall, 357 coins that become the logo, a VO-synced headline system | [![](projects/zemyth/docs/poster.jpg)](projects/zemyth/) |
 | [04 · Nova Pitch](projects/novapitch/) | 60 s | Product film drawn by one line: 4,800 ignored decks, a ray-traced glass orb, the real product UI at film scale, a produced score measured to the frame, a galaxy that signs the N; every title held for its reading time | [![](projects/novapitch/docs/poster.jpg)](projects/novapitch/) |
 | [05 · 翡月荟](projects/feiyuehui/) | 40 s | Brand film for a jadeite house, released photoreal: a three.js film (the ring rising over a sea of cloud like the moon, a vortex of 100 cabochons, 设计 · 雕刻 描金 · 镶嵌, the collection orbiting the sunrise, a gold phoenix lockup), rendered again as clay and re-rendered by Seedance 2.5 from the client's own product photos; every title is the code render's own pixels | [![](projects/feiyuehui/v4/docs/poster.jpg)](projects/feiyuehui/) |
-| [06 · almost friends](projects/almostfriends/) | 66 s, 9:16 | Product film for a friend-making app: a bubble character knocks on the wall of your bubble ("How to make more friends") until it pops on the drop; the app shown in a real phone; a 3D flight through a universe of people; an anonymous chat; a two-key unlock in silence; a circle of friends with room to breathe | [![](projects/almostfriends/docs/poster.jpg)](projects/almostfriends/) |
+| [06 · almost friends](projects/almostfriends/) | 66 s, 9:16, English + 中文 | Product film for a friend-making app: a bubble character knocks on the wall of your bubble ("How to make more friends") until it pops on the drop; the app shown in a real phone; a 3D flight through a universe of people; an anonymous chat; a two-key unlock in silence; a circle of friends with room to breathe | [![](projects/almostfriends/docs/poster.jpg)](projects/almostfriends/) |
 
 Each reel has a `README.md` (what you're watching, how to run it) and a `LEARNING.md` (workflow,
 decisions, every bug with root cause and prevention, measured quality gates). The rules all of them share — the
@@ -34,6 +34,7 @@ npm run np:assets && npm run np:render && npm run np:check && npm run np:read   
 npm run fy:render && npm run fy:check   # reel 05, the code render (needs the client's asset package locally, see its README)
 npm run fy:real                         # reel 05, the photoreal release cut (needs the local Seedance takes)
 npm run af:audio && npm run af:render && npm run af:check && npm run af:read   # reel 06 (af:render4k for the 4K master)
+npm run af:audio:zh && npm run af:render:zh && npm run af:check:zh && npm run af:read:zh   # reel 06, the Chinese cut
 ```
 
 Renders are deterministic: seeded randomness, and each frame is a pure function of time.

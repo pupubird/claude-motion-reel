@@ -3,9 +3,9 @@
 A 66 s **vertical** (1080×1920, 60 fps, 120 BPM, 33 bars) product film for a friend-making app, rendered in code on a
 vertical engine adapted from reels 04–05, with an ElevenLabs score and an AI-generated cast. **Status: v6 locked and
 released** ([`almostfriends-v1.0`](https://github.com/pupubird/claude-motion-reel/releases/tag/almostfriends-v1.0)):
-a 1080p master, a 4K master and a web encode. This file records how it was made: the owner's notes and what each cut
-changed, the rules a cut is judged by, the workflow, the decisions, the measured quality, the spend, and every bug with
-its root cause and prevention.
+a 1080p master, a 4K master and a web encode, plus a Chinese cut (中文版) rendered from the same code. This file records
+how it was made: the owner's notes and what each cut changed, the rules a cut is judged by, the workflow, the decisions,
+the measured quality, the spend, and every bug with its root cause and prevention.
 
 ## Versions: the owner's notes and what each cut changed
 
@@ -17,6 +17,7 @@ its root cause and prevention.
 | v4 (68 s) | 7 notes: research the hook and remake it; remake the name scene; Bub must live in the universe; more growing friends; a visible unlock; no ".ai" at the punchline; no "not dates" | "Knock knock" from research, a 3D mark, a 3D Bub that searches (two nos and a yes), a padlock unlock with a click-clack in the silence, a foam of 240 friends |
 | v5 (68 s) | 2 notes: lead with "how to make more friends" and show the product; the growing foam felt "有点密集恐惧" | The owner's words, one line per knock, "friends" carried into the name; 26 separate bubbles with air instead of a packed foam |
 | v6 (66 s), released | 3 notes: the hook in 2 s at most; recast young, middle- to high-income and international, with new leads | The hook in one bar (the pop on the drop at 2.0 s), the score cut by one bar, 32 new portraits |
+| v6 中文 (66 s) | After the lock: "做个中文版的, font must be great" | A Chinese cut from one copy table: the words adapted, Noto Sans SC set by its ink, 朋友 flipping into the name, its own cue sheet and mix; the English cut proven unchanged |
 
 ## The owner's preferences (the rules a cut is judged by)
 
@@ -61,6 +62,10 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 - Show abundance without crowding: a few dozen big faces with air between them, never a packed cluster of small ones
   (trypophobia: Cole & Wilkins, *Psychological Science*, 2013).
 
+**The Chinese cut**
+- A Chinese cut is part of the work for this audience, and its type is judged as hard as the English: "font must be
+  great". A real Chinese face with real weights, set by its own metrics, never a fallback font or a synthesised bold.
+
 **Copy and brand**
 - Say friendship positively. No "not dating" disclaimers, and none of the category's worn words ("find your people",
   "like-minded").
@@ -90,6 +95,7 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 | 14 | v5 from 2 notes: the owner's own hook copy on v4's staging, "friends" carried into the name; the foam re-laid as a spaced circle with its anti-crowding rules checked at load | Stills through the pop and the carry at 0.05 s; foam stills every 0.6 s; all gates |
 | 15 | v6 from 3 notes: the hook re-timed into one bar and the score's second intro bar cut (`splice_score.py --cut 2`, sample-exact), every later anchor −2 s; the cast regenerated in the background while the re-time was built | The cut verified sample-exact against v5's score + 2 s; stills through the new hook; all gates |
 | 16 | Lock and release: the lead portrait that was 1k upscaled for 4K, the master mix at −2 dBTP, 16-sample 1080p and 4K masters, gates on the masters, a web encode, the release | Frame and jump gates on both masters; −14 LUFS and ≤ −1 dBTP on the MP4 |
+| 17 | The Chinese cut: every string moved into `src/copy.js` (one table per cut, the same shape enforced at load), the English cut proven unchanged before anything Chinese was judged, Han metrics measured in the font, stills of every beat, its own cue sheet and mix, gates on its master | English: 29 of 32 stills pixel-identical, the other 3 within the renderer's own run-to-run noise; its cue sheet byte-identical; its reading check the same 77 strings and 5 flags. Chinese: all gates. The one deliberate change to both cuts, the eased chat scroll, touches only frames within 0.3 s of a message arriving (2 of the 32 stills) |
 
 ## Decisions
 
@@ -119,6 +125,12 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 | People | Ordinary, casual iPhone snapshots (owner's rule) | Real users, not models |
 | Copy | Site-free, research-led; "find your people" and "like-minded" kept off screen | The category's worn words |
 | Score | Sunlit disco-funk, marimba/vibraphone hook, measured key (t1 came back A major; foley transposed −3) | "The conversation is the song" |
+| Chinese face | Noto Sans SC (the Source Han Sans design, SIL OFL), variable 100–900, from Fontsource's 101 unicode-range slices; only the slices holding the cut's characters load, before the first frame | Owner: "font must be great". A great Chinese sans that may ship in a public repo; every weight the film asks for (UI 500–750, display 790–820) is a real cut. A character no slice covers throws instead of falling back to a system font |
+| Chinese setting | Latin and digits keep Bricolage Grotesque / Figtree; Han follows in the stack, after the emoji face (Noto Sans SC carries monochrome emoji of its own); lines centred on their ink; Han display leading 1.14; full-width punctuation, "!!" and "??" half-width in casual chat | Han ink rises 0.81–0.87 em against 0.70 for a capital (measured with fontTools at wght 800), and its ！ ？ 。 ， sit at the left of a whole em (blank half-ems): Latin metrics would collide and mis-centre |
+| Chinese copy | Adapted, not translated: 三观一致 (shares your values), 志同道合 (like-minded, an idiom), 聊得来 (we click), 纯友谊 (friendship, said positively), 圈子 (the social sense of "bubble"), TA (the gender-neutral pronoun) | The viewer's own idiom, as the English uses the viewer's own words; the full table is in `STORYBOARD.md` § The Chinese cut |
+| The brand in Chinese | Latin: almost / friends.ai, Bub, the AI tag and the "almost → friends" punchline; the hero word 朋友 glides into the name and flips into "friends" (a split-flap, 0.16 s, its own click) | The brand is one wordmark in every market; the flip keeps v5's carry (the word you came for becomes the name) and shows the name's meaning |
+| Designed hits (v6 中文) | The jump gate lists the knocks (0.25, 0.5 s) and the day flips (36.25, 38.25 s: the sky turns to the next dawn on a tick, with an air swell into it) in `--allow`, and prints near misses | They had passed unlisted by a hair (11.8–11.9 against 12); the Chinese cut's denser 第 N 天 label tipped them to 12.1–12.3 |
+| Chinese reading guide | 0.23 s a Han character (260 a minute) on top of the 0.5 s to find the line; Latin words inside count as words | Native readers' maximum reading speed for Chinese, 259.5 ± 38.2 characters/min (Wang, Lin, Guo et al. 2019, PMC6456801), as conservative as the English 160 wpm |
 
 ## Measured quality (the released masters)
 
@@ -132,6 +144,9 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 | Foley gates | Tonal: no steady tone over 43 ms across 193 cues. Quiet: 48.00–49.45 s is digital silence (the breath before their lock opens) |
 | Hits | The pop at 2.0 s lands +12.9 dB over the 0.4 s before it; the drop after the unlock (50.0 s) +32.7 dB over the silence |
 | 4K master | 3,960 frames, 2160×3840, 60 fps, bt709; 16 sub-samples; H.264 CRF 16, AAC 320 kb/s (110 MB). Frame gate pass; jump gate pass (the designed knock); −14.0 LUFS, −1.0 dBTP, LRA 4.1 LU; the release's copy matches the local file (SHA-256) |
+| Chinese master (中文) | 3,960 frames, 1080×1920, 60 fps, bt709; 16 sub-samples; H.264 CRF 14, AAC 320 kb/s (58 MB). Web: two-pass 6 Mb/s, AAC 192 kb/s (49 MB) |
+| Chinese gates | Frame gate pass. Jump gate pass with only the designed hits (the knocks, the two day flips) and no near misses. Reading (advisory): 76 strings, 8 flags: the English cut's 5 (the Pick 3 counter and the badge), the two candidate labels 财富第一 and 健康第一 (held 1.1 s for 4 characters), and the 我也是!! burst, which echoes the chat line on screen |
+| Chinese loudness | Master −14.0 LUFS, −1.0 dBTP, LRA 4.2 LU; web −14.1 LUFS, −1.1 dBTP. Foley: tonal gate pass over 191 cues; the breath (48.00–49.45 s) digital silence |
 
 ## Spend
 
@@ -139,6 +154,7 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 |---|---|---|
 | Higgsfield (GPT Image 2) | 8 portraits (v1), 40 (v4), 34 (v6, 32 used), one 2k upscale (v6) | 52 + 140 + 128.5 + 2 = 322.5 credits (balance 2,140.41 after) |
 | ElevenLabs (music) | 8 takes: t1, t2, v2a, v2b, v3a–d; v4–v6 re-used them (one bar inserted, one cut) | v3's four takes: 7,212 credits; the others were not metered one by one |
+| The Chinese cut | Copy, type and sound made in code; Noto Sans SC is open source | No spend |
 
 ## Bugs → root cause → prevention
 | Symptom | Root cause | Fix | Prevention |
@@ -181,9 +197,15 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 | One portrait failed (HTTP 503) and the retry ran at the wrong resolution | `gen_people.py` skips nothing on failure, and the second batch (1k) picked up the lead the first batch (2k) had failed | Kept the 1k take (it reads well); the 4K master upscales it | Retry failed keys in their own batch with their own `--res` |
 | 10 of 32 portraits refused (`rate_limit_reached`) | Two batches ran side by side (8 + 3 jobs); the creator plan runs 8 at once and refuses the rest | Re-ran the 10 at 6 at a time | `gen_people.py` retries rate limits and 503s with a backoff; `--par` documents the plan's limit across all batches |
 | Hana's face crop centred on her mother behind her | YuNet on the full 2k image missed the big face in front and found the small one behind | Detect on a ≤ 1024 px copy and scale the box back (`face_crops.py`) | The crop sheet is checked after every run; a lead's crop is judged before any render |
+| The step badge sat on top of every Chinese caption | Captions were placed by a baseline tuned for Latin capitals (0.70 em); Han ink rises 0.81–0.87 em | Chinese captions hang from the badge by their ink, led at 1.14 | `Line` measures Han lines by their ink (ascent, centre, width); judge a new script's lines against what sits above and below them |
+| 朋友 (300 px) ran into Bub; 聊 3 天 ran over the phone's island | The English sizes and baselines were reused for a script that fills the em box | The hook re-spaced from measured metrics (128 / 128 / 248 px, baselines 330 / 478 / 733); captions at 100 px | Per-cut sizes and baselines live in the copy table beside the words that need them |
+| A chat bubble broke the idiom 雷打不动 in two | Greedy wrapping broke where the width ran out, between 雷打 and 不动 | A break the writer chose (`\n`) after the comma | Chinese wraps between ICU words with kinsoku; a writer's break overrides; read every wrapped bubble |
+| The chat thread jumped a bubble's height in one frame whenever a message arrived | `conversation()` added a new message's whole height to the scroll at once. On the English master it measured 9.7 at 40.0 s, under the gate's 12, so it passed unseen; the Chinese master measured 12.2 and failed | The scroll eases over 0.3 s (`MOVE.go`), as iMessage does | `check_jumps.py` prints near misses (> 9 and 3× the neighbours) without failing; the released English masters predate the fix and show the old snap |
+| Two renders of the same code differed in 3 of 32 frames | Canvas text anti-aliasing: ≤ 1 level in ≤ 60 pixels, run to run | — (not a bug) | An "unchanged" check compares against a second render of the same code, not against zero |
 
 ## Next (after the release)
 
+- The Chinese cut's ≤ 60 s and ~30 s versions with the English ones; the copy table already carries every line.
 - A ≤ 60 s cut for TikTok ads (TikTok caps ads at 60 s) and a ~30 s cut for paid social: the hook, the search, SAME!!,
   the unlock, the circle of friends.
 - An A/B hook cell: the research's runner-up, "Snow globe" (five friends trapped in one bubble that Bub pops).

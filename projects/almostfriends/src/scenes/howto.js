@@ -12,11 +12,12 @@ import * as THREE from 'three';
 import { W, H } from '../config.js';
 import { C, FONTS, UI, P, PKEYS, SPRING, MOVE } from '../brand.js';
 import { NAME, ONB, MATCH, CHAT, UNLOCK } from '../score.js';
+import { T, fill } from '../copy.js';
 import { clamp, lerp, seg, ease, spring, smoothstep, TAU, rgba } from '../util.js';
 import { drawSky } from '../world/sky.js';
 import { drawBubble2D, drawBubFace, drawColorOrb, blinkAt } from '../world/bubble2d.js';
 import { APP_ICON } from '../world/mark.js';
-import { Line, drawLine, popEach, combine, centerX, waveEach } from '../type.js';
+import { Line, drawLine, popEach, combine, centerX, waveEach, CJK } from '../type.js';
 import { layoutMsg, drawMsg, typing } from '../ui/chat.js';
 import { squirclePath, text, measure, about } from '../ui/kit.js';
 import { homeIndicator } from '../ui/ios.js';
@@ -43,23 +44,19 @@ const sparks = burst(71, 44, { speed: [700, 1700], spread: TAU, size: [12, 24], 
 
 export default {
   init(env) {
-    const cap = (s, size = 110) => new Line(s, { s: size, w: 790, track: -0.03 });
-    caps = [
-      { n: '1', at: ONB.cap, out: MATCH.cap - CAP_GAP, lines: [cap('Pick what'), cap('matters to you')] },
-      { n: '2', at: MATCH.cap, out: CHAT.cap - CAP_GAP, lines: [cap('AI finds people'), cap('who share them')] },
-      { n: '3', at: CHAT.cap, out: CHAT.noNames - CAP_GAP, lines: [cap('Chat anonymously', 102), cap('for 3 days', 102)] },
-      { n: '3', at: CHAT.noNames, out: UNLOCK.step - CAP_GAP, lines: [cap('No names. No photos.', 84), cap('Just talk anonymously.', 84)], blue: 1 },
-      { n: '4', at: UNLOCK.step, out: UNLOCK.both - 0.3, lines: [cap('It takes'), cap('two yeses.')] },
-    ];
+    const cap = (s, size) => new Line(s, { s: size, w: 790, track: -0.03 });
+    const steps = [['1', ONB.cap, MATCH.cap - CAP_GAP], ['2', MATCH.cap, CHAT.cap - CAP_GAP], ['3', CHAT.cap, CHAT.noNames - CAP_GAP],
+      ['3', CHAT.noNames, UNLOCK.step - CAP_GAP], ['4', UNLOCK.step, UNLOCK.both - 0.3]];
+    caps = T.caps.map((c, i) => ({ n: steps[i][0], at: steps[i][1], out: steps[i][2], lines: c.lines.map((l) => cap(l, c.s)), ...(c.blue !== undefined ? { blue: c.blue } : {}) }));
     const lm = (s, maxW = 300) => layoutMsg(s, K, { maxW, size: 19 });
-    mB1 = lm('Hi! I’m Bub \u{1F44B}');
-    mB2 = lm('What matters most to you right now?');
-    mYou = lm('Family, Career, Adventure');
-    mBub = lm('Got it! Let me look around \u{1F50E}');
-    hero1 = new Line('Family first?', { s: pt(30), w: 780, track: -0.02 });
-    hero2 = new Line('So are they.', { s: pt(30), w: 780, track: -0.02 });
-    same = new Line('SAME!!', { s: 250, w: 800, track: -0.04 });
-    dayLines = ['Day 1', 'Day 2', 'Day 3'].map((s) => new Line(s, { s: 120, w: 800, track: -0.03 }));
+    mB1 = lm(T.bub.hi);
+    mB2 = lm(T.bub.ask);
+    mYou = lm(PICKS.map((k) => P[k].label).join(T.list));
+    mBub = lm(T.bub.got);
+    hero1 = new Line(T.hero[0], { s: pt(30), w: 780, track: -0.02 });
+    hero2 = new Line(T.hero[1], { s: pt(30), w: 780, track: -0.02 });
+    same = new Line(T.same.text, { s: T.same.s, w: 800, track: -0.04 });
+    dayLines = [1, 2, 3].map((d) => new Line(fill(T.day, { d }), { s: 120, w: 800, track: -0.03 }));
     // the tags, two per row, centred rows
     const mctx = document.createElement('canvas').getContext('2d');
     chips = ORDER.map((key) => ({ key, label: `${P[key].emoji}  ${P[key].label}` }));
@@ -193,7 +190,10 @@ function captions(ctx, t) {
   }
   for (const c of caps) {
     if (t < c.at - 0.05 || t > c.out + 0.6) continue;
-    let k = 0, y = 372;
+    // Chinese fills the em box: its first line hangs from the badge by its ink, and its lines are led at 1.14 (Han
+    // has no ascenders or descenders to share the gap), so the block ends where the English one does (~500)
+    const han = CJK.test(c.lines[0].text);
+    let k = 0, y = han ? BADGE.y + BADGE.r + 10 + c.lines[0].ascent : 372;
     c.lines.forEach((line, i) => {
       const at = line.words.map((_, w) => c.at + 0.08 + (k + w) * 0.075);
       const k0 = k;
@@ -204,7 +204,7 @@ function captions(ctx, t) {
       };
       k += line.words.length;
       drawLine(ctx, line, centerX(line, W / 2), y, { fill: c.blue === i ? C.blue : C.ink, each: combine(popEach(line, t, at), exit) });
-      y += Math.max(line.opt.s, c.lines[Math.min(i + 1, c.lines.length - 1)].opt.s) * 1.02;
+      y += Math.max(line.opt.s, c.lines[Math.min(i + 1, c.lines.length - 1)].opt.s) * (han ? 1.14 : 1.02);
     });
   }
 }
@@ -227,7 +227,7 @@ function screen(ctx, t) {
 
 function onboarding(ctx, t) {
   appSky(ctx);
-  topBar(ctx, t, { title: 'Bub', sub: 'AI · finds you friends', avatar: bubAvatar(t, { blink: blinkAt(t, [ONB.cap + 1.45, ONB.cap + 4.3]) }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
+  topBar(ctx, t, { title: 'Bub', sub: T.bub.sub, avatar: bubAvatar(t, { blink: blinkAt(t, [ONB.cap + 1.45, ONB.cap + 4.3]) }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
   drawMsg(ctx, mB1, pt(16), L.onb.m1, 'in', t, ONB.m1, { fill: '#FFFFFF', ink: UI.ink, k: K, lift: 0.6, joinBottom: true });
   drawMsg(ctx, mB2, pt(16), L.onb.m1 + mB1.H + pt(4), 'in', t, ONB.m2, { fill: '#FFFFFF', ink: UI.ink, k: K, lift: 0.6, joinTop: true });
   // the tag dock, in the thread
@@ -236,7 +236,7 @@ function onboarding(ctx, t) {
   if (dockOut < 1) {
     ctx.save();
     ctx.globalAlpha *= 1 - dockOut;
-    if (t >= ONB.chips) text(ctx, `Pick 3 · ${picked}/3`, W / 2, L.onb.pick, { f: FONTS.ui, w: 700, size: pt(15), color: UI.ink2, align: 'center' });
+    if (t >= ONB.chips) text(ctx, fill(T.pick, { n: picked }), W / 2, L.onb.pick, { f: FONTS.ui, w: 700, size: pt(15), color: UI.ink2, align: 'center' });
     chips.forEach((c, i) => {
       const inP = spring(t - (ONB.chips + i * 0.045), SPRING.pop);
       if (inP <= 0.001) return;
@@ -296,7 +296,7 @@ function chipView(ctx, c, st, rank, t, tapT) {
 // Step 2's screen: you as an orb in your three colours, a radar pulsing out of you while Bub looks around.
 function matching(ctx, t) {
   appSky(ctx);
-  topBar(ctx, t, { title: 'Bub', sub: 'is looking around…', avatar: bubAvatar(t, { look: [Math.sin(t * 6) * 0.8, 0], happy: 0, wide: 0.5 }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
+  topBar(ctx, t, { title: 'Bub', sub: T.bub.looking, avatar: bubAvatar(t, { look: [Math.sin(t * 6) * 0.8, 0], happy: 0, wide: 0.5 }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
   const R = L.radar;
   const born = seg(t, ONB.next + 0.15, ONB.next + 0.6, MOVE.in);
   if (t >= MATCH.radar) {
@@ -308,8 +308,8 @@ function matching(ctx, t) {
     }
   }
   drawColorOrb(ctx, W / 2, R.orb, pt(46), YOU_COLORS, [born, born, born], { t, seed: 1.3 });
-  text(ctx, 'You', W / 2, R.you, { f: FONTS.ui, w: 750, size: pt(17), color: UI.ink, align: 'center' });
-  text(ctx, 'Family · Career · Adventure', W / 2, R.you + pt(24), { f: FONTS.ui, w: 600, size: pt(15), color: UI.ink2, align: 'center' });
+  text(ctx, T.you, W / 2, R.you, { f: FONTS.ui, w: 750, size: pt(17), color: UI.ink, align: 'center' });
+  text(ctx, PICKS.map((k) => P[k].label).join(' · '), W / 2, R.you + pt(24), { f: FONTS.ui, w: 600, size: pt(15), color: UI.ink2, align: 'center' });
   homeIndicator(ctx, 0, 0, W, H, K, UI.ink);
 }
 
@@ -336,8 +336,8 @@ function matched(ctx, t) {
   }
   const lab = seg(t, MATCH.kiss + 0.15, MATCH.kiss + 0.4);
   ctx.save(); ctx.globalAlpha *= lab;
-  text(ctx, 'You', W / 2 - r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
-  text(ctx, 'Curious Otter', W / 2 + r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
+  text(ctx, T.you, W / 2 - r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
+  text(ctx, T.otter, W / 2 + r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
   ctx.restore();
   drawLine(ctx, hero1, centerX(hero1, W / 2), M.hero1, { fill: UI.ink, each: popEach(hero1, t, [MATCH.line, MATCH.line + 0.1]) });
   drawLine(ctx, hero2, centerX(hero2, W / 2), M.hero2, { fill: C.blue, each: popEach(hero2, t, [MATCH.line + 0.35, MATCH.line + 0.45, MATCH.line + 0.55]) });
@@ -347,7 +347,7 @@ function matched(ctx, t) {
     const cyB = M.sayhi + M.sayhiH / 2;
     about(ctx, W / 2, cyB, bp * press, bp * press, () => {
       ctx.fillStyle = C.blue; ctx.fill(squirclePath(W / 2 - pt(105), M.sayhi, pt(210), M.sayhiH, M.sayhiH / 2));
-      text(ctx, 'Say hi \u{1F44B}', W / 2, cyB + pt(7), { f: FONTS.ui, w: 750, size: pt(19), color: '#FFFFFF', align: 'center' });
+      text(ctx, T.sayHi, W / 2, cyB + pt(7), { f: FONTS.ui, w: 750, size: pt(19), color: '#FFFFFF', align: 'center' });
     });
     const u = (t - MATCH.sayhi + 0.1) / 0.36;
     if (u > 0 && u < 1) { ctx.save(); ctx.globalAlpha *= Math.sin(u * Math.PI) * 0.32; ctx.fillStyle = UI.ink; ctx.beginPath(); ctx.arc(W / 2 + pt(30), cyB + pt(4), pt(22) * (1 - 0.15 * Math.sin(u * Math.PI)), 0, TAU); ctx.fill(); ctx.restore(); }
@@ -647,7 +647,7 @@ function flightOverlay(ctx, t) {
     const p = spring(t - c.at - 0.08, SPRING.pop);
     const out = seg(t, c.nope + 0.5, c.nope + 0.7, MOVE.out);
     const shake = t > c.nope && t < c.nope + 0.4 ? Math.sin((t - c.nope) * 50) * (1 - (t - c.nope) / 0.4) : 0;
-    callout(ctx, `${P[c.key].emoji}  ${P[c.key].label} first`, cx, clamp(cy - cr - 80, 680, 1500), p, { alpha: 1 - out, shake });
+    callout(ctx, `${P[c.key].emoji}  ${fill(T.first, { p: P[c.key].label })}`, cx, clamp(cy - cr - 80, 680, 1500), p, { alpha: 1 - out, shake });
   });
   // the scan: rings out of Bub
   const sk = t - MATCH.scan;
@@ -687,5 +687,5 @@ function flightOverlay(ctx, t) {
     }
   }
   const lp = spring(t - MATCH.found - 0.05, SPRING.pop) * (1 - seg(t, MATCH.back - 0.2, MATCH.back - 0.08));
-  if (lp > 0.001) callout(ctx, `${P.family.emoji}  Family first`, clamp(ox, 300, 780), clamp(oy + orr + 80, 700, 1290), lp);   // under the one, held to the rush
+  if (lp > 0.001) callout(ctx, `${P.family.emoji}  ${fill(T.first, { p: P.family.label })}`, clamp(ox, 300, 780), clamp(oy + orr + 80, 700, 1290), lp);   // under the one, held to the rush
 }

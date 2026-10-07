@@ -2,9 +2,10 @@
 // day dots; Bub's icebreaker; the conversation. Drawn inside the phone for step 3 and full screen under the unlock
 // sheet. Text is set at 19 pt (a step up from iOS's 17 pt body) so it reads inside the phone on a phone.
 import { W, H } from '../config.js';
-import { C, FONTS, UI, P, SPRING } from '../brand.js';
+import { C, FONTS, UI, P, SPRING, MOVE } from '../brand.js';
 import { CHAT } from '../score.js';
-import { clamp, lerp, spring, rgba } from '../util.js';
+import { T, fill } from '../copy.js';
+import { clamp, lerp, seg, spring, rgba } from '../util.js';
 import { drawBubble2D, drawBubFace, drawColorOrb } from '../world/bubble2d.js';
 import { layoutMsg, drawMsg, typing } from './chat.js';
 import { squirclePath, text, about } from './kit.js';
@@ -29,21 +30,14 @@ export const UNIVERSE_CAST = {
   candColors: CANDS.map((c) => c.colors),
 };
 
-// [side, text, at] — Day 1 is read; Days 2–3 move fast (the time-lapse), the last line settles to be read
+// [side, at] for each line of the thread (copy.js chat.thread) — Day 1 is read; Days 2–3 move fast (the time-lapse),
+// the last line settles to be read
 const THREAD = [
-  ['in', 'Sunday dinner at my mum’s. Non-negotiable \u{1F602}', CHAT.otter],
-  ['out', 'WAIT. Same!!', CHAT.same],
-  ['in', 'ok we’re trading dumpling recipes', CHAT.days0 + 0.5],
-  ['out', 'tried yours. my mum cried \u{1F62D}', CHAT.day2 - 0.6],
-  ['in', 'happy tears I hope??', CHAT.day2 + 0.2],
-  ['out', 'she wants to meet you lol', CHAT.day2 + 0.9],
-  ['in', 'my kids would love yours', CHAT.day3 - 0.2],
-  ['out', 'weekend picnic? \u{1F9FA}', CHAT.day3 + 0.6],
-  ['in', 'honestly feels like I’ve known you for years', CHAT.last],
-];
+  ['in', CHAT.otter], ['out', CHAT.same], ['in', CHAT.days0 + 0.5], ['out', CHAT.day2 - 0.6], ['in', CHAT.day2 + 0.2],
+  ['out', CHAT.day2 + 0.9], ['in', CHAT.day3 - 0.2], ['out', CHAT.day3 + 0.6], ['in', CHAT.last],
+].map(([side, at], i) => [side, T.chat.thread[i], at]);
 let M = null;
-const ICE1 = 'You both put Family first.';
-const ICE2 = 'What’s a tradition you’d never give up?';
+const [ICE1, ICE2] = T.chat.ice;
 
 export const dayAt = (t) => (t < CHAT.day2 ? 1 : t < CHAT.day3 ? 2 : 3);
 
@@ -54,8 +48,10 @@ export function conversation(ctx, t, { on = 1, viewBottom = pt(560) } = {}) {
   appSky(ctx);
   const shown = M.filter((m) => t >= m.at);
   const cardY = pt(150);
+  // the thread scrolls up as a message arrives, eased over 0.3 s as iMessage does; adding the whole height at once
+  // jumped the thread a bubble's height in one frame (the Chinese master's jump gate caught it at 40.0 s)
   let contentH = pt(104);
-  for (const m of shown) contentH += m.m.H + pt(8);
+  for (const m of shown) contentH += (m.m.H + pt(8)) * MOVE.go(seg(t, m.at, m.at + 0.3));
   const scroll = Math.max(0, cardY + contentH - viewBottom);
   ctx.save();
   ctx.beginPath(); ctx.rect(0, pt(140), W, H); ctx.clip();
@@ -91,7 +87,7 @@ export function conversation(ctx, t, { on = 1, viewBottom = pt(560) } = {}) {
   appSky(ctx, 0, 0, W, pt(160));
   const day = dayAt(t);
   topBar(ctx, t, {
-    title: 'Curious Otter', sub: `Day ${day} of 3 · anonymous`,
+    title: T.otter, sub: fill(T.chat.sub, { d: day }),
     avatar: (c, cx, cy, r) => drawColorOrb(c, cx, cy, r, OTTER_COLORS, [1, 1, 1], { t, seed: 4.1 }),
     right: (c, x, yy) => {
       for (let i = 0; i < 3; i++) {
@@ -105,7 +101,7 @@ export function conversation(ctx, t, { on = 1, viewBottom = pt(560) } = {}) {
   glass(ctx, squirclePath(pt(16), cy, pt(40), pt(40), pt(20)));
   icon(ctx, 'plus', pt(24), cy + pt(8), pt(24), UI.ink, 2);
   glass(ctx, squirclePath(pt(64), cy, W - pt(80), pt(40), pt(20)));
-  text(ctx, 'Message', pt(82), cy + pt(26), { f: FONTS.ui, w: 500, size: pt(16), color: UI.ink3, log: false });
+  text(ctx, T.chat.composer, pt(82), cy + pt(26), { f: FONTS.ui, w: 500, size: pt(16), color: UI.ink3, log: false });
   homeIndicator(ctx, 0, 0, W, H, K, UI.ink);
   ctx.restore();
 }

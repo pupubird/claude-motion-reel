@@ -52,6 +52,10 @@ export const NAME = strict('NAME', {
   open: 7.12,           // the app opens out of the icon (howto.js)
   phone: 7.5,
 });
+// The value pops in word by word, a soft click each (hook.js valueWords, tools/cues.mjs): line i starts at
+// [0, 0.2, 0.42][i] after NAME.value + 0.04, its words 0.1 s apart (0.12 on the last). `counts` is words per line
+// (copy.js words()), so each cut's clicks land on its own words: English 2 · 2 · 2, Chinese 1 · 2 · 1.
+export const valuePops = (counts) => counts.map((n, i) => Array.from({ length: n }, (_, j) => NAME.value + 0.04 + [0, 0.2, 0.42][i] + j * (i === 2 ? 0.12 : 0.1)));
 
 // III · 1 PICK WHAT MATTERS TO YOU (bars 5–7)
 export const ONB = strict('ONB', {

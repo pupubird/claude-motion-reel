@@ -1,9 +1,15 @@
 // The foley cue sheet, built from the picture's own anchors (src/score.js), so sound and picture cannot drift.
 //   node projects/<film>/tools/cues.mjs > projects/<film>/audio/cues.json
+//   node projects/<film>/tools/cues.mjs --lang=zh > projects/<film>/audio/cues-zh.json   (the Chinese cut: the same
+//   sheet, except where a sound counts a cut's own words, and the flip of 朋友 into the name)
 // Each cue: { t (s), kind, gain (dB), pan (−1…1), …options } for tools/foley.py. v3: nothing is pitched — every UI
 // sound is a click, tap, tick, pop, swoosh, thump or impact (owner: "no more ding ding dong dong"); the score
 // carries the melody. A 'quiet' entry is a window foley.py keeps empty (it fails the render if a tail rings into it).
-import { HOOK, NAME, ONB, MATCH, CHAT, UNLOCK, FOAM, GROW, MARK } from '../src/score.js';
+import { HOOK, NAME, ONB, MATCH, CHAT, UNLOCK, FOAM, GROW, MARK, valuePops } from '../src/score.js';
+import { copyFor, words } from '../src/copy.js';
+
+const args = Object.fromEntries(process.argv.slice(2).map((a) => { const s = a.replace(/^--/, ''); const i = s.indexOf('='); return i < 0 ? [s, true] : [s.slice(0, i), s.slice(i + 1)]; }));
+const T = copyFor(args.lang ?? 'en');
 
 const cues = [];
 // a cue a hair before frame 0 (an anchor that starts the film already moving) sounds on frame 0; earlier is a bug
@@ -45,11 +51,13 @@ add(NAME.icon, 'swish', { dur: 0.2, gain: G.swish - 4 });
 add(NAME.icon + 0.2, 'impact', { size: 'small', gain: G.impactS });
 add(NAME.icon + 0.2, 'pop', { gain: G.pop });
 'almost'.split('').forEach((_, i) => add(NAME.name + i * 0.035, 'tick', { gain: G.tickQuiet, texture: 1 }));
-// "friends" is carried over from the hook; only ".ai" pops (hook.js CARRY_END = NAME.name + 0.1 + 6 · 0.005)
+// "friends" is carried over from the hook; only ".ai" pops (hook.js CARRY_END = NAME.name + 0.1 + 6 · 0.005). A hero
+// word that is not "friends" (朋友) flips into it first: a click as it folds flat (hook.js FLIP, 0.16 s before CARRY_END)
 '.ai'.split('').forEach((_, i) => add(NAME.name + 0.13 + 0.02 + i * 0.05, 'tick', { gain: G.tickQuiet, texture: 1 }));
+if (T.hook.lines[2] !== 'friends') add(NAME.name + 0.13 - 0.08, 'click', { gain: G.click - 6 });
 add(NAME.dive, 'whoosh', { dur: 0.3, gain: G.whoosh + 2 });
 add(NAME.dive + 0.16, 'pop', { gain: G.pop - 2 });                           // through the wall
-[0.04, 0.14, 0.24, 0.34, 0.46, 0.58].forEach((dt) => add(NAME.value + dt, 'click', { gain: G.click - 12, texture: 1 }));
+valuePops(T.value.lines.map((l) => words(l).length)).flat().forEach((t) => add(t, 'click', { gain: G.click - 12, texture: 1 }));
 [0, 0.14, 0.28].forEach((dt, i) => add(NAME.value + 1.2 + dt, 'pop', { gain: G.pop - 4, pan: (i - 1) * 0.4 }));   // hook.js VALUE_TAGS: three tags
 add(NAME.exit - 0.15, 'swish', { dur: 0.3, gain: G.swish - 2, pan: -0.4 }); // Bub flies to the icon
 add(NAME.exit, 'pop', { gain: G.pop - 2 });                                   // the icon
@@ -139,7 +147,7 @@ add(UNLOCK.both, 'impact', { gain: G.impact });
 add(UNLOCK.lift, 'whoosh', { dur: 0.4, gain: G.whoosh + 1 });           // the orbs burst out of the phone
 add(UNLOCK.wallPop, 'impact', { gain: G.impact });
 add(UNLOCK.wallPop, 'pop', { size: 'big', gain: G.popBig + 1 });
-[0, 0.1, 0.2].forEach((dt) => add(UNLOCK.wallPop + 0.02 + dt, 'click', { gain: G.click }));   // You're · both · in!
+words(T.both).forEach((_, i) => add(UNLOCK.wallPop + 0.02 + i * 0.1, 'click', { gain: G.click }));   // You're · both · in!
 add(UNLOCK.wallPop + 0.02, 'spray', { gain: G.spray + 2 });
 add(UNLOCK.faces, 'pop', { gain: G.pop + 3, pan: -0.3 }); add(UNLOCK.faces + 0.12, 'pop', { gain: G.pop + 3, pan: 0.3 });
 add(UNLOCK.names, 'tick', { gain: G.tick, pan: -0.3 }); add(UNLOCK.names + 0.15, 'tick', { gain: G.tick, pan: 0.3 });

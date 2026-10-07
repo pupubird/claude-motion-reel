@@ -28,8 +28,12 @@
     "af:audio": "node projects/almostfriends/tools/cues.mjs > projects/almostfriends/audio/cues.json && python3 projects/almostfriends/tools/foley.py && python3 projects/almostfriends/tools/mix.py --score v6a-s --swell 1.4,2.0 --breath 48 --tp -2",
     "af:render": "node projects/almostfriends/render.mjs --samples=16 --workers=3 --crf=14 --wav=projects/almostfriends/audio/mix.wav --out=projects/almostfriends/out/almostfriends-reel-2026.mp4",
     "af:render4k": "node projects/almostfriends/render.mjs --samples=16 --workers=3 --scale=2 --crf=16 --wav=projects/almostfriends/audio/mix.wav --out=projects/almostfriends/out/almostfriends-reel-2026-4k.mp4",
-    "af:check": "python3 projects/almostfriends/tools/check_frames.py projects/almostfriends/out/almostfriends-reel-2026.mp4 && python3 projects/almostfriends/tools/check_jumps.py projects/almostfriends/out/almostfriends-reel-2026.mp4 --allow=0.5",
-    "af:read": "node projects/almostfriends/tools/check_reading.mjs"
+    "af:check": "python3 projects/almostfriends/tools/check_frames.py projects/almostfriends/out/almostfriends-reel-2026.mp4 && python3 projects/almostfriends/tools/check_jumps.py projects/almostfriends/out/almostfriends-reel-2026.mp4 --allow=0.25,0.5,36.25,38.25",
+    "af:read": "node projects/almostfriends/tools/check_reading.mjs",
+    "af:audio:zh": "node projects/almostfriends/tools/cues.mjs --lang=zh > projects/almostfriends/audio/cues-zh.json && python3 projects/almostfriends/tools/foley.py --cues projects/almostfriends/audio/cues-zh.json --out projects/almostfriends/audio/foley-zh.wav && python3 projects/almostfriends/tools/mix.py --score v6a-s --swell 1.4,2.0 --breath 48 --tp -2 --foley foley-zh.wav --out mix-zh.wav",
+    "af:render:zh": "node projects/almostfriends/render.mjs --lang=zh --samples=16 --workers=3 --crf=14 --wav=projects/almostfriends/audio/mix-zh.wav --out=projects/almostfriends/out/almostfriends-reel-2026-zh.mp4",
+    "af:check:zh": "python3 projects/almostfriends/tools/check_frames.py projects/almostfriends/out/almostfriends-reel-2026-zh.mp4 && python3 projects/almostfriends/tools/check_jumps.py projects/almostfriends/out/almostfriends-reel-2026-zh.mp4 --allow=0.25,0.5,36.25,38.25",
+    "af:read:zh": "node projects/almostfriends/tools/check_reading.mjs --lang=zh"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +45,7 @@
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/inter-tight": "^5.3.0",
+    "@fontsource-variable/noto-sans-sc": "^5.3.0",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",

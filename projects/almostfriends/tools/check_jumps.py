@@ -4,6 +4,8 @@
 # raises its neighbours too, so it doesn't count.
 #   python3 projects/<film>/tools/check_jumps.py video.mp4 [--allow=4.0,50.0]
 # --allow lists designed hits (s): a jump within 0.1 s of one is reported but doesn't fail the gate.
+# Near misses (mean |Δ| > 9 and > 3× the local median) are reported too, without failing: the chat's one-frame scroll
+# snap measured 9.7 on the English master and passed unseen, then 12.2 on the Chinese one.
 # Validated on reel 06: it finds v1's four cuts (29.62, 32.02, 34.02, 35.92 s) and, on v2, only the designed pop.
 import subprocess, sys
 import numpy as np
@@ -27,7 +29,10 @@ d = np.abs(np.diff(f, axis=0)).mean(axis=(1, 2))
 loc = np.array([np.median(d[max(0, i - 6):i + 7]) for i in range(len(d))])
 jumps = [((i + 1) / fps, d[i]) for i in range(len(d)) if d[i] > 12 and d[i] > 4 * max(loc[i], 1)]
 bad = [(t, v) for t, v in jumps if not any(abs(t - a) <= 0.1 for a in allow)]
+near = [((i + 1) / fps, d[i]) for i in range(len(d)) if 9 < d[i] <= 12 and d[i] > 3 * max(loc[i], 1)
+        and not any(abs((i + 1) / fps - a) <= 0.1 for a in allow)]
 print(f'{len(f)} frames · median change {np.median(d):.2f} · jumps {len(jumps)}: ' +
       (', '.join(f'{t:.2f}s ({v:.0f}){"" if (t, v) in bad else " designed"}' for t, v in jumps) or 'none'))
+if near: print('near misses (look at them): ' + ', '.join(f'{t:.2f}s ({v:.1f})' for t, v in near))
 print('JUMP GATE ' + ('PASS' if not bad else f'FAIL ({len(bad)} unplanned)'))
 sys.exit(1 if bad else 0)

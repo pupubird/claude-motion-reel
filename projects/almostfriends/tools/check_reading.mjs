@@ -2,21 +2,25 @@
 // it was (src/type.js drawLine, src/ui/kit.js text). A string counts as readable while it is ≥ 90 % opaque and still
 // (≤ 2 px of motion). The guide is
 //     0.5 s to find it (a saccade ≈ 0.2 s + a first fixation ≈ 0.25 s; Rayner 1998)
-//   + 0.375 s a word (160 wpm, the slow end of the BBC's 160–180 wpm for text over moving pictures).
+//   + 0.375 s a word (160 wpm, the slow end of the BBC's 160–180 wpm for text over moving pictures)
+//   + 0.23 s a Chinese character (260 characters/min: native readers' maximum reading speed for Chinese, 259.5 ± 38.2
+//     characters/min; Wang, Lin, Guo et al. 2019, "Visual requirement for Chinese reading with normal vision",
+//     PMC6456801). Latin words and numbers inside Chinese count as words.
 // The owner's rule (reel 05): reading time is flexible — a known line, a label, or a phrase that completes one already
 // on screen can be quicker. So this is advisory: it flags strings held for under 80 % of the guide.
-//   node projects/<film>/tools/check_reading.mjs [--from=0 --to=3600]
+//   node projects/<film>/tools/check_reading.mjs [--from=0 --to=3600] [--lang=zh]
 import { FPS, FRAMES, W, H } from '../src/config.js';
 import { serveFilm, launchChrome } from './chrome.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const s = a.replace(/^--/, ''); const i = s.indexOf('='); return i < 0 ? [s, true] : [s.slice(0, i), s.slice(i + 1)]; }));
-const FIND = 0.5, PER_WORD = 0.375, STEP = 2, FLAG = 0.8;
+const FIND = 0.5, PER_WORD = 0.375, PER_HAN = 0.23, STEP = 2, FLAG = 0.8;
+const HAN = /[\u3400-\u9FFF\uF900-\uFAFF]/gu;
 const from = Number(args.from ?? 0), to = Number(args.to ?? FRAMES);
 const server = await serveFilm();
 const browser = await launchChrome();
 const page = await browser.newPage({ viewport: { width: W, height: H } });
 page.on('pageerror', (e) => { console.error('[pageerror]', e.message); process.exitCode = 1; });
-await page.goto(server.url({ mode: 'render', textlog: '1' }));
+await page.goto(server.url({ mode: 'render', textlog: '1', ...(args.lang ? { lang: args.lang } : {}) }));
 await page.waitForFunction(() => window.__ready === true, null, { timeout: 300000 });
 
 const seen = new Map();                                 // string → { first, frames }
@@ -51,8 +55,9 @@ const replaced = (k) => keys.some((o) => o !== k && o.startsWith(k) && seen.get(
 const rows = keys
   .filter((k) => !replaced(k))
   .map((k) => {
-    const words = k.split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
-    return { k, first: seen.get(k).first / FPS, hold: longestRun(seen.get(k).frames), words, need: FIND + PER_WORD * words };
+    const han = (k.match(HAN) || []).length;
+    const words = k.replace(HAN, ' ').split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+    return { k, first: seen.get(k).first / FPS, hold: longestRun(seen.get(k).frames), words, need: FIND + PER_WORD * words + PER_HAN * han };
   })
   .sort((a, b) => a.first - b.first);
 
