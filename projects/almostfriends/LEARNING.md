@@ -131,7 +131,7 @@ Collected from every round of notes on this film and on reels 02–05; each one 
 | Loudness | Master MP4: −14.0 LUFS, −1.0 dBTP, LRA 4.1 LU. Web: −14.1 LUFS, −1.3 dBTP |
 | Foley gates | Tonal: no steady tone over 43 ms across 193 cues. Quiet: 48.00–49.45 s is digital silence (the breath before their lock opens) |
 | Hits | The pop at 2.0 s lands +12.9 dB over the 0.4 s before it; the drop after the unlock (50.0 s) +32.7 dB over the silence |
-| 4K master | 2160×3840, 60 fps, H.264 CRF 16: rendering at release time; attached to the release once its gates pass |
+| 4K master | 3,960 frames, 2160×3840, 60 fps, bt709; 16 sub-samples; H.264 CRF 16, AAC 320 kb/s (110 MB). Frame gate pass; jump gate pass (the designed knock); −14.0 LUFS, −1.0 dBTP, LRA 4.1 LU; the release's copy matches the local file (SHA-256) |
 
 ## Spend
 
