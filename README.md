@@ -14,6 +14,7 @@ https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 | [04 · Nova Pitch](projects/novapitch/) | 60 s | Product film drawn by one line: 4,800 ignored decks, a ray-traced glass orb, the real product UI at film scale, a produced score measured to the frame, a galaxy that signs the N; every title held for its reading time | [![](projects/novapitch/docs/poster.jpg)](projects/novapitch/) |
 | [05 · 翡月荟](projects/feiyuehui/) | 40 s | Brand film for a jadeite house, released photoreal: a three.js film (the ring rising over a sea of cloud like the moon, a vortex of 100 cabochons, 设计 · 雕刻 描金 · 镶嵌, the collection orbiting the sunrise, a gold phoenix lockup), rendered again as clay and re-rendered by Seedance 2.5 from the client's own product photos; every title is the code render's own pixels | [![](projects/feiyuehui/v4/docs/poster.jpg)](projects/feiyuehui/) |
 | [06 · almost friends](projects/almostfriends/) | 66 s, 9:16, English + 中文 | Product film for a friend-making app: a bubble character knocks on the wall of your bubble ("How to make more friends") until it pops on the drop; the app shown in a real phone; a 3D flight through a universe of people; an anonymous chat; a two-key unlock in silence; a circle of friends with room to breathe | [![](projects/almostfriends/docs/poster.jpg)](projects/almostfriends/) |
+| [06 · almost friends — special edition](projects/almostfriends-special/) | 66 s, 9:16, English + 中文 | The released cut, frame for frame — the same words, score and tempo — with every bubble that carries the story re-made in a raymarched liquid engine: your orb tears as the camera dives through it, a gold glass ring locks on the one, two people's bubbles kiss and share a real wall, SAME!! bursts out as blue jelly, each face bursts out of its own film, and the mark is a glossy liquid double bubble. The phone is a real 3D device under a camera that never rests, and every line of type stands inside its shot — written on the bubble's wall, beside the turned phone, in the universe's crowd, among the friends — never on top of it | [![](projects/almostfriends-special/docs/poster.jpg)](projects/almostfriends-special/) |
 
 Each reel has a `README.md` (what you're watching, how to run it) and a `LEARNING.md` (workflow,
 decisions, every bug with root cause and prevention, measured quality gates). The rules all of them share — the
@@ -35,6 +36,8 @@ npm run fy:render && npm run fy:check   # reel 05, the code render (needs the cl
 npm run fy:real                         # reel 05, the photoreal release cut (needs the local Seedance takes)
 npm run af:audio && npm run af:render && npm run af:check && npm run af:read   # reel 06 (af:render4k for the 4K master)
 npm run af:audio:zh && npm run af:render:zh && npm run af:check:zh && npm run af:read:zh   # reel 06, the Chinese cut
+npm run afs:render && npm run afs:check && npm run afs:read   # reel 06, the special edition (plays the released mix; afs:render4k for 4K)
+npm run afs:render:zh && npm run afs:check:zh && npm run afs:read:zh   # reel 06 special, the Chinese cut (the released Chinese mix)
 ```
 
 Renders are deterministic: seeded randomness, and each frame is a pure function of time.

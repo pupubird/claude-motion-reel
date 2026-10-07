@@ -1,0 +1,7 @@
+{
+ "name": "tap2",
+ "prompt": "Single crisp tap on glass, short clean click, close microphone, dry, silent background",
+ "seconds": 0.5,
+ "prompt_influence": 0.7,
+ "credits": "5"
+}

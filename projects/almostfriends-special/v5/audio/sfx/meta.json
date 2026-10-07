@@ -1,0 +1,290 @@
+{
+ "air": {
+  "onset": 0.109,
+  "peak": 0.714,
+  "end": 1.849,
+  "len": 2.0,
+  "peak_db": -0.0,
+  "rms_db": -17.2,
+  "centroid": 579
+ },
+ "bloop1": {
+  "onset": 0.0,
+  "peak": 0.0,
+  "end": 0.6,
+  "len": 0.6,
+  "peak_db": -5.0,
+  "rms_db": -24.6,
+  "centroid": 819
+ },
+ "bloop2": {
+  "onset": 0.0,
+  "peak": 0.013,
+  "end": 0.6,
+  "len": 0.6,
+  "peak_db": -21.6,
+  "rms_db": -40.6,
+  "centroid": 4270
+ },
+ "boing": {
+  "onset": 0.0,
+  "peak": 0.003,
+  "end": 0.68,
+  "len": 0.68,
+  "peak_db": 0.0,
+  "rms_db": -18.7,
+  "centroid": 1525
+ },
+ "fizz": {
+  "onset": 0.0,
+  "peak": 1.862,
+  "end": 3.0,
+  "len": 3.0,
+  "peak_db": -21.9,
+  "rms_db": -36.6,
+  "centroid": 3116
+ },
+ "flip": {
+  "onset": 0.0,
+  "peak": 0.268,
+  "end": 0.48,
+  "len": 0.48,
+  "peak_db": -7.3,
+  "rms_db": -35.4,
+  "centroid": 5505
+ },
+ "gather": {
+  "onset": 0.081,
+  "peak": 0.899,
+  "end": 1.657,
+  "len": 2.2,
+  "peak_db": 0.0,
+  "rms_db": -14.3,
+  "centroid": 2566
+ },
+ "heart": {
+  "onset": 0.0,
+  "peak": 0.0,
+  "end": 0.8,
+  "len": 0.8,
+  "peak_db": -6.4,
+  "rms_db": -32.6,
+  "centroid": 291
+ },
+ "impact": {
+  "onset": 0.0,
+  "peak": 0.192,
+  "end": 2.0,
+  "len": 2.0,
+  "peak_db": -7.6,
+  "rms_db": -28.0,
+  "centroid": 10235
+ },
+ "lock": {
+  "onset": 0.0,
+  "peak": 0.341,
+  "end": 0.6,
+  "len": 0.6,
+  "peak_db": -1.7,
+  "rms_db": -30.8,
+  "centroid": 10345
+ },
+ "padlock": {
+  "onset": 0.058,
+  "peak": 0.129,
+  "end": 0.599,
+  "len": 0.8,
+  "peak_db": -2.8,
+  "rms_db": -27.7,
+  "centroid": 9336
+ },
+ "pop_b1": {
+  "onset": 0.0,
+  "peak": 0.074,
+  "end": 1.221,
+  "len": 1.48,
+  "peak_db": -0.9,
+  "rms_db": -21.5,
+  "centroid": 4118
+ },
+ "pop_b2": {
+  "onset": 0.005,
+  "peak": 0.811,
+  "end": 1.381,
+  "len": 1.48,
+  "peak_db": -9.2,
+  "rms_db": -37.5,
+  "centroid": 6947
+ },
+ "pop_s1": {
+  "onset": 0.0,
+  "peak": 0.025,
+  "end": 0.48,
+  "len": 0.48,
+  "peak_db": 0.0,
+  "rms_db": -18.8,
+  "centroid": 3668
+ },
+ "pop_s2": {
+  "onset": 0.005,
+  "peak": 0.029,
+  "end": 0.137,
+  "len": 0.48,
+  "peak_db": 0.0,
+  "rms_db": -19.8,
+  "centroid": 1943
+ },
+ "recv": {
+  "onset": 0.0,
+  "peak": 0.139,
+  "end": 0.305,
+  "len": 0.48,
+  "peak_db": 0.0,
+  "rms_db": -13.2,
+  "centroid": 1123
+ },
+ "rim": {
+  "onset": 0.097,
+  "peak": 0.366,
+  "end": 0.937,
+  "len": 1.48,
+  "peak_db": -0.0,
+  "rms_db": -14.8,
+  "centroid": 658
+ },
+ "riser": {
+  "onset": 1.081,
+  "peak": 1.654,
+  "end": 2.0,
+  "len": 2.0,
+  "peak_db": 0.0,
+  "rms_db": -12.4,
+  "centroid": 2118
+ },
+ "scan": {
+  "onset": 0.0,
+  "peak": 0.01,
+  "end": 1.48,
+  "len": 1.48,
+  "peak_db": -15.7,
+  "rms_db": -39.5,
+  "centroid": 1465
+ },
+ "send": {
+  "onset": 0.0,
+  "peak": 0.001,
+  "end": 0.6,
+  "len": 0.6,
+  "peak_db": 0.0,
+  "rms_db": -17.0,
+  "centroid": 6798
+ },
+ "shimmer": {
+  "onset": 0.0,
+  "peak": 0.194,
+  "end": 1.48,
+  "len": 1.48,
+  "peak_db": -4.4,
+  "rms_db": -21.6,
+  "centroid": 7789
+ },
+ "squeak": {
+  "onset": 0.0,
+  "peak": 0.004,
+  "end": 0.48,
+  "len": 0.48,
+  "peak_db": -0.0,
+  "rms_db": -16.4,
+  "centroid": 6850
+ },
+ "squish": {
+  "onset": 0.033,
+  "peak": 0.074,
+  "end": 0.955,
+  "len": 1.0,
+  "peak_db": -14.8,
+  "rms_db": -41.0,
+  "centroid": 1761
+ },
+ "stretch": {
+  "onset": 0.0,
+  "peak": 0.847,
+  "end": 1.075,
+  "len": 1.2,
+  "peak_db": -0.1,
+  "rms_db": -22.0,
+  "centroid": 1035
+ },
+ "sub": {
+  "onset": 0.0,
+  "peak": 0.072,
+  "end": 1.2,
+  "len": 1.2,
+  "peak_db": -1.3,
+  "rms_db": -16.1,
+  "centroid": 140
+ },
+ "tap1": {
+  "onset": 0.007,
+  "peak": 0.025,
+  "end": 0.181,
+  "len": 0.48,
+  "peak_db": -0.0,
+  "rms_db": -22.5,
+  "centroid": 4271
+ },
+ "tap2": {
+  "onset": 0.011,
+  "peak": 0.029,
+  "end": 0.362,
+  "len": 0.48,
+  "peak_db": -6.1,
+  "rms_db": -35.1,
+  "centroid": 9001
+ },
+ "thud": {
+  "onset": 0.0,
+  "peak": 0.084,
+  "end": 0.5,
+  "len": 0.6,
+  "peak_db": 0.0,
+  "rms_db": -11.9,
+  "centroid": 785
+ },
+ "tick": {
+  "onset": 0.007,
+  "peak": 0.149,
+  "end": 0.423,
+  "len": 0.48,
+  "peak_db": -8.2,
+  "rms_db": -33.8,
+  "centroid": 9457
+ },
+ "typing": {
+  "onset": 0.049,
+  "peak": 0.232,
+  "end": 0.936,
+  "len": 1.0,
+  "peak_db": 0.0,
+  "rms_db": -21.6,
+  "centroid": 7951
+ },
+ "uipop": {
+  "onset": 0.0,
+  "peak": 0.001,
+  "end": 0.48,
+  "len": 0.48,
+  "peak_db": 0.0,
+  "rms_db": -16.6,
+  "centroid": 1624
+ },
+ "whip": {
+  "onset": 0.002,
+  "peak": 0.106,
+  "end": 0.892,
+  "len": 1.0,
+  "peak_db": 0.0,
+  "rms_db": -15.9,
+  "centroid": 3175
+ }
+}

@@ -1,0 +1,7 @@
+{
+ "name": "tick",
+ "prompt": "Soft tiny mechanical tick, a single click of a counter, dry, silent background",
+ "seconds": 0.5,
+ "prompt_influence": 0.7,
+ "credits": "5"
+}

@@ -1,0 +1,843 @@
+// III–VI · HOW IT WORKS (9.5–50.4 s): one phone, four steps, a plain caption above it the whole time, and a camera
+// that pushes in on whatever matters (ui/phonecam.js).
+//   1 Pick what matters to you (10–15.25)  Bub asks; six tags; three quick taps; your answer; "Let me look around"
+//   2 AI finds people who share them (15.25–27.5)  the radar; the camera dives into your orb, which bursts into the
+//      bubble universe (3D): Bub flies through it looking around, the scan lights up people who share your values,
+//      Bub spots the one, and the one carries you back into the app: the match
+//   3 Chat anonymously for 3 days (27.5–41.5)  a push-in on "WAIT. Same!!", SAME!! bursts out as the camera pulls
+//      back; three days in the sky
+//   4 It takes two yeses (41.5–50.4)  the unlock sheet inside the phone (scenes/unlock.js draws it) and the slow push
+//      onto their slot; at the drop unlock.js takes over
+import * as THREE from 'three';
+import { W, H, SH } from '../config.js';
+import { C, FONTS, UI, P, SPRING, MOVE } from '../brand.js';
+import { NAME, ONB, MATCH, CHAT, UNLOCK } from '../score.js';
+import { T, fill } from '../copy.js';
+import { clamp, lerp, seg, ease, spring, springVel, smoothstep, TAU, rgba } from '../util.js';
+import { drawSky } from '../world/sky.js';
+import { drawBubble2D, blinkAt } from '../world/bubble2d.js';
+import { APP_ICON } from '../world/mark.js';
+import { Line, drawLine, popEach, combine, centerX, waveEach, measureStr } from '../type.js';
+import { layoutMsg, drawMsg, typing } from '../ui/chat.js';
+import { squirclePath, text, measure, about } from '../ui/kit.js';
+import { homeIndicator } from '../ui/ios.js';
+import { K, appSky, topBar, bubAvatar, aiTag } from '../ui/app.js';
+import { drawLaunch, launchU, SCREEN_SCALE } from '../ui/phone.js';
+import { sp, sr, INK_ORB, inkOf, wallBetween, bubPrim, quatFromY, quatFromZ, WALL } from '../liquid2d.js';
+import { phonePose, LAYOUT, setTargets, phoneCamera, projectScreen, PHONE_CAM } from '../ui/phonecam.js';
+import { phone3d, toWorld, worldPerPx } from '../gl/phone3d.js';
+import { pinSteps, placeSteps, focusAt, sunAt, capFrame, capPoint, capBeads, stepCaps } from './steps.js';
+import { airPrims } from './air.js';
+import { sign, depthOf } from '../gl/sign.js';
+import { system as systemUI } from '../ui/phone.js';
+import { conversation, OTTER_COLORS, UNIVERSE_CAST, YOU_COLORS, CANDS } from '../ui/convo.js';
+import { universe, PATH, project } from '../gl/universe.js';
+import { unlockScreen, lockFloat } from './unlock.js';
+import { burst, particleAt, drawDroplet } from '../morph.js';
+
+const pt = (v) => v * K;
+const L = LAYOUT;
+const PICKS = ['family', 'career', 'adventure'];
+const ORDER = ['family', 'wealth', 'career', 'health', 'learning', 'adventure'];
+const VIEW = { viewBottom: pt(430) };         // the chat keeps its newest message high in the phone
+const FLY0 = MATCH.dive + 0.1;                // the 3D flight: your orb bursts and the universe opens
+let mB1, mB2, mYou, mBub, chips, hero1, hero2, same, U, PH, PSCENE;
+const shards = burst(61, 110, { speed: [1000, 2600], spread: TAU, size: [10, 26] });
+const sparks = burst(71, 44, { speed: [700, 1700], spread: TAU, size: [12, 24], colors: [P.family.color, C.gold, '#FFFFFF', P.adventure.color] });
+
+export default {
+  init(env) {
+    const lm = (s, maxW = 300) => layoutMsg(s, K, { maxW, size: 19 });
+    mB1 = lm(T.bub.hi);
+    mB2 = lm(T.bub.ask);
+    mYou = lm(PICKS.map((k) => P[k].label).join(T.list));
+    mBub = lm(T.bub.got);
+    hero1 = new Line(T.hero[0], { s: pt(30), w: 780, track: -0.02 });
+    hero2 = new Line(T.hero[1], { s: pt(30), w: 780, track: -0.02 });
+    same = new Line(T.same.text, { s: T.same.s, w: 800, track: -0.04 });
+    // the tags, two per row, centred rows
+    const mctx = document.createElement('canvas').getContext('2d');
+    chips = ORDER.map((key) => ({ key, label: `${P[key].emoji}  ${P[key].label}` }));
+    for (let r = 0; r < 3; r++) {
+      const pair = chips.slice(r * 2, r * 2 + 2);
+      const ws = pair.map((c) => measure(mctx, c.label, { f: FONTS.ui, w: 650, size: pt(17.5) }) + pt(34));
+      let x = W / 2 - (ws[0] + ws[1] + pt(10)) / 2;
+      pair.forEach((c, i) => { c.x = x; c.y = L.onb.chips + r * L.onb.row; c.w = ws[i]; c.h = L.onb.chipH; x += ws[i] + pt(10); });
+    }
+    U = universe(env, UNIVERSE_CAST);
+    // the phone in 3D: its own scene over the sky (gl/phone3d.js), seen through the phone's lens (ui/phonecam.js)
+    PSCENE = new THREE.Scene();
+    PSCENE.add(env.makeBackdrop());
+    PH = phone3d(env);
+    PSCENE.add(PH.group);
+    PADLOCK = PH.floater(512, 512);
+    // the camera frames the screens' real layout (ui/phonecam.js): Bub's question, the finger on each tag, the answers
+    setTargets({
+      q: { x: pt(16), y: L.onb.m1, w: Math.max(mB1.W, mB2.W), h: mB1.H + pt(4) + mB2.H },
+      chips: Object.fromEntries(chips.map((c) => [c.key, [c.x + c.w * 0.62, c.y + c.h * 0.6]])),
+      chipsY: L.onb.chips + L.onb.row + L.onb.chipH / 2,
+      answer: [W - pt(16) - mYou.W / 2, L.onb.sent + mYou.H / 2],
+      reply: [pt(16) + mBub.W / 2, L.onb.sent + mYou.H + pt(10) + mBub.H / 2],
+    });
+    pinSteps((t, cam) => {
+      const r = flightRig(t);
+      cam.copy(U.camera); cam.position.copy(r.cam); cam.up.set(0, 1, 0); cam.lookAt(r.look); cam.rotateZ(r.roll); cam.updateMatrixWorld();
+    });
+  },
+
+  // step 2's flight through the universe: Bub is a 3D character in it (gl/bub3d.js), depth-tested with the crowd
+  three: {
+    start: NAME.phone, end: UNLOCK.both + 0.37,
+    update(t) { return t >= FLY0 && t < MATCH.back ? flightUpdate(t) : phoneUpdate(t); },
+  },
+
+  // the special edition's liquid: the match's double bubble on the phone
+  liquid: { start: NAME.phone, end: UNLOCK.lift, frame: phoneLiquid },
+
+  under: [{
+    start: NAME.open - 0.2, end: UNLOCK.both + 0.6,
+    // the sky; in step 3 it runs through three days (dawn → noon → golden → dusk, never night), with a sun. (The phone
+    // is 3D: phoneUpdate)
+    draw(ctx, t) { skyDays(ctx, t); },
+  }],
+
+  layers: [{
+    start: NAME.open, end: UNLOCK.both + 0.6,
+    draw(ctx, t) {
+      if (t < NAME.phone) {
+        // the app opens out of its icon (Bub's landing on it in the hook is the tap)
+        drawLaunch(ctx, launchU(t - NAME.open, NAME.phone - NAME.open), APP_ICON, (c) => screen(c, t), { t });
+      } else if (t >= FLY0 && t < MATCH.back) {
+        flightOverlay(ctx, t);
+      } else {
+        overlays(ctx, t, phonePose(t));
+      }
+      // (the captions are in the shot: scenes/steps.js)
+    },
+  }],
+  fx(t) {
+    // the burst out of your orb into the universe, and the cut back out of the one's bubble: a flash and a shove
+    const k = t - FLY0, k2 = t - MATCH.back;
+    if (k > 0 && k < 0.5) return { flash: 0.22 * Math.exp(-k * 14), zoom: 1 + 0.04 * Math.exp(-k * 7) };
+    if (k2 > -0.16 && k2 < 0.45) return { flash: 0.3 * (k2 < 0 ? smoothstep(-0.16, 0, k2) : Math.exp(-k2 * 10)) };    // the cut happens inside their film (flightLiquid); a light bloom on it
+    return null;
+  },
+};
+
+let PADLOCK = null;
+// The phone shots in 3D: the lens for this pose, the app drawn onto the glass at the size it is seen (sharp in a
+// close-up, cheap from afar), the padlock floating over their orb, the captions standing beside it, and the phone
+// away at the reveal
+function phoneUpdate(t) {
+  const pose = phonePose(t);
+  phoneCamera(pose, PHONE_CAM);
+  PH.draw((c) => { screen(c, t); systemUI(c); }, clamp(SCREEN_SCALE * pose.s * 1.2, 0.6, 2.2));
+  PH.setAlpha(1 - seg(t, UNLOCK.both + 0.1, UNLOCK.both + 0.36));
+  PH.group.rotation.y = turntable(t);
+  const lk = lockFloat(t);
+  if (lk) PADLOCK.show(lk.x, lk.y, lk.h, lk.size, lk.draw); else PADLOCK.hide();
+  // the captions stand in the phone's world (scenes/steps.js); the lens is focused on the glass it frames
+  const glass = PHONE_CAM.position.distanceTo(focusOf(pose));
+  phoneCamera(pose, PHONE_CAM);                                     // (focusOf borrowed the lag camera; the lens is set)
+  placeSteps(t, PSCENE, PHONE_CAM, focusAt(t, PHONE_CAM, glass, pose.s));
+  // no bloom: the titanium band's top edge bloomed into a white haze over the sky above the phone (owner: "top part
+  // is blurred out") and greyed the Dynamic Island; a product shot stays crisp
+  return { scene: PSCENE, camera: PHONE_CAM, bloom: { strength: 0 } };
+}
+
+// the days' turntable: the phone itself turns (not the lens, so its caption holds still beside it), from a little
+// away from the words round toward them, and squares up again for the last message (no liquid lies on its glass then)
+function turntable(t) {
+  const on = seg(t, CHAT.noNames, CHAT.noNames + 0.6, MOVE.go) * (1 - seg(t, CHAT.last - 0.4, CHAT.last + 0.1, MOVE.go));
+  return on * lerp(-0.26, 0.3, seg(t, CHAT.noNames, CHAT.last - 0.4, ease.inOutSine));
+}
+
+// where the lens's axis meets the glass for a pose (what it is focused on)
+const LAG_CAM = new THREE.PerspectiveCamera();
+const _focus = new THREE.Vector3();
+function focusOf(pose) {
+  phoneCamera(pose, LAG_CAM);
+  const f = new THREE.Vector3(0, 0, -1).applyQuaternion(LAG_CAM.quaternion);
+  // the point the phone's lens orbits lies on the glass, where its axis meets it
+  const k = (toWorld(0, 0)[2] - LAG_CAM.position.z) / (f.z || -1e-4);
+  return _focus.copy(LAG_CAM.position).addScaledVector(f, k);
+}
+
+// step 2's flight through the universe: Bub is a 3D character in it (gl/bub3d.js), depth-tested with the crowd
+function flightUpdate(t) {
+      const rig = flightRig(t);
+      const cam = U.camera;
+      cam.position.copy(rig.cam);
+      cam.up.set(0, 1, 0);
+      cam.lookAt(rig.look);
+      cam.rotateZ(rig.roll);
+      cam.updateMatrixWorld();
+      // the heroes, far to near in render order (transparent films blend back to front)
+      const heroes = [[U.bub.root, rig.bub], [U.one, rig.one], [U.cands[0], rig.cand[0].pos], [U.cands[1], rig.cand[1].pos]]
+        .sort((p, q) => q[1].distanceTo(rig.cam) - p[1].distanceTo(rig.cam));
+      heroes.forEach(([o], i) => { if (o !== U.bub.root) { o.children[0].renderOrder = 10 + i * 10; o.children[1].renderOrder = 13 + i * 10; } });
+      const bubOrder = 10 + heroes.findIndex(([o]) => o === U.bub.root) * 10;
+      U.bub.root.visible = true;
+      _toCam.copy(rig.cam).sub(rig.bub).normalize();
+      U.bub.set({ ...rig.face, pos: rig.bub, r: rig.bubR, toCam: _toCam, t, order: bubOrder });
+      U.one.visible = true;
+      const liquidHeroes = t >= ORB_TEAR[1];             // from here Bub, the one and the two checks are liquid: flightLiquid
+      U.one.position.copy(rig.one); U.one.scale.setScalar(rig.oneR);
+      const ou = U.one.uniforms;
+      ou.uTime.value = t; ou.uGlow.value = 0.5 + 0.9 * rig.glow;
+      ou.uSquash.value = rig.oneSquash; ou.uSquashDir.value.copy(rig.oneSquashDir); ou.uWobble.value = 0.02 + 0.05 * rig.oneWob;
+      U.cands.forEach((m, i) => {
+        const c = rig.cand[i];
+        m.visible = c.vis > 0.001;
+        m.position.copy(c.pos); m.scale.setScalar(c.r);
+        const cu = m.uniforms;
+        cu.uTime.value = t; cu.uAlpha.value = c.vis; cu.uGlow.value = 0.4;
+        cu.uSquash.value = c.squash; cu.uSquashDir.value.copy(c.squashDir); cu.uWobble.value = 0.02 + 0.06 * c.wob;
+      });
+      if (liquidHeroes) { U.bub.root.visible = U.one.visible = false; for (const m of U.cands) m.visible = false; }
+      const u = U.uniforms;
+      u.uTime.value = t;
+      u.uAlpha.value = seg(t, FLY0, FLY0 + 0.15);
+      u.uVeil.value = 0;
+      u.uBurst.value = 0; u.uOne.value = -1;
+      u.uBubAt.value.copy(rig.bub); u.uBubR.value = rig.bubR; u.uPush.value = 1;
+      u.uClearAt.value.copy(rig.one); u.uClearR.value = rig.oneR;
+      u.uScanAt.value.copy(rig.scanAt);
+      u.uScanR.value = lerp(-1, 110, seg(t, MATCH.scan, MATCH.scan + 1.8, ease.outCubic));
+      u.uLitGain.value = 1 + 0.6 * Math.exp(-Math.max(0, t - MATCH.scan) * 1.5);
+      u.uNear.value = 10; u.uFar.value = 70;
+      u.uNearFade.value = 2.6 * seg(t, MATCH.fly, MATCH.fly + 0.6) * (1 - seg(t, MATCH.rush, MATCH.rush + 0.3));
+      // step 2's caption stands in the universe (scenes/steps.js): drawn after the crowd and depth-tested with it
+      placeSteps(t, U.scene, cam, 4, 'universe', { order: 50, aperture: 5 });
+      flightLabels(t, rig, cam);
+      return { scene: U.scene, camera: cam, bloom: { strength: 0.32, threshold: 1.05, radius: 0.55 } };
+}
+
+// the sky behind the phone: three days in step 3 (dawn → noon → golden → dusk, never night), with a sun
+function skyDays(ctx, t) {
+  const days = seg(t, CHAT.days0 - 0.2, CHAT.days0 + 0.2) * (1 - seg(t, CHAT.last - 0.2, CHAT.last + 0.3));
+  let tod = 0.5;
+  if (days > 0) {
+    const u = clamp((t - CHAT.days0) / 2, 0, 3), f = u - Math.floor(u);
+    tod = lerp(0.5, lerp(0.0, 1.5, Math.min(f * 1.15, 1)), days);
+  }
+  drawSky(ctx, { tod });
+  if (days > 0) {
+    const { x: sx, y: sy } = sunAt(t);                     // (it lights the days' caption from behind: scenes/steps.js)
+    const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 170);
+    g.addColorStop(0, '#FFF6D8'); g.addColorStop(0.3, rgba('#FFD86E', 0.95)); g.addColorStop(1, rgba('#FFD86E', 0));
+    ctx.save(); ctx.globalAlpha *= days; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sx, sy, 170, 0, TAU); ctx.fill(); ctx.restore();
+  }
+}
+
+
+// What the phone's screen shows (design coordinates), joined by iOS pushes.
+function screen(ctx, t) {
+  const slide = (t0) => MOVE.go(seg(t, t0, t0 + 0.42));
+  const push = (fnOut, fnIn, u) => {
+    if (u <= 0) return fnOut();
+    if (u >= 1) return fnIn();
+    ctx.save(); ctx.translate(-W * 0.3 * u, 0); fnOut(); ctx.restore();
+    ctx.save(); ctx.translate(W * (1 - u), 0); ctx.shadowColor = 'rgba(11,27,63,0.2)'; ctx.shadowBlur = 40; fnIn(); ctx.restore();
+  };
+  if (t < ONB.next + 0.45) push(() => onboarding(ctx, t), () => matching(ctx, t), slide(ONB.next));
+  else if (t < MATCH.back) matching(ctx, t);
+  else if (t < MATCH.next + 0.45) push(() => matched(ctx, t), () => conversation(ctx, t, VIEW), slide(MATCH.next));
+  else if (t < UNLOCK.sheet) conversation(ctx, t, VIEW);
+  else unlockScreen(ctx, t, VIEW);
+}
+
+function onboarding(ctx, t) {
+  appSky(ctx);
+  topBar(ctx, t, { title: 'Bub', sub: T.bub.sub, avatar: bubAvatar(t, { blink: blinkAt(t, [ONB.cap + 1.45, ONB.cap + 4.3]) }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
+  drawMsg(ctx, mB1, pt(16), L.onb.m1, 'in', t, ONB.m1, { fill: '#FFFFFF', ink: UI.ink, k: K, lift: 0.6, joinBottom: true });
+  drawMsg(ctx, mB2, pt(16), L.onb.m1 + mB1.H + pt(4), 'in', t, ONB.m2, { fill: '#FFFFFF', ink: UI.ink, k: K, lift: 0.6, joinTop: true });
+  // the tag dock, in the thread
+  const dockOut = seg(t, ONB.sent - 0.12, ONB.sent + 0.18, MOVE.out);
+  const picked = PICKS.filter((_, i) => t >= ONB.taps[i]).length;
+  if (dockOut < 1) {
+    ctx.save();
+    ctx.globalAlpha *= 1 - dockOut;
+    if (t >= ONB.chips) text(ctx, fill(T.pick, { n: picked }), W / 2, L.onb.pick, { f: FONTS.ui, w: 700, size: pt(15), color: UI.ink2, align: 'center' });
+    chips.forEach((c, i) => {
+      const inP = spring(t - (ONB.chips + i * 0.045), SPRING.pop);
+      if (inP <= 0.001) return;
+      const rank = PICKS.indexOf(c.key);
+      const tapT = rank >= 0 ? ONB.taps[rank] : Infinity;
+      const st = rank >= 0 ? seg(t, tapT, tapT + 0.12, MOVE.in) : 0;
+      const press = rank >= 0 ? 1 - 0.12 * Math.sin(clamp((t - tapT + 0.05) / 0.14) * Math.PI) : 1;
+      const lift = rank >= 0 ? seg(t, ONB.sent - 0.12, ONB.sent + 0.15, MOVE.out) : 0;
+      const s = inP * press * (1 + 0.18 * lift);
+      about(ctx, c.x + c.w / 2, c.y + c.h / 2, s, s, () => chipView(ctx, c, st, rank, t, tapT));
+    });
+    ctx.restore();
+  }
+  // one finger, three quick taps: it lands on each tag on the 8th and glides to the next
+  const fA = seg(t, ONB.taps[0] - 0.22, ONB.taps[0] - 0.08) * (1 - seg(t, ONB.taps[2] + 0.1, ONB.taps[2] + 0.28));
+  if (fA > 0) {
+    const at = PICKS.map((k) => chips.find((q) => q.key === k)).map((c) => [c.x + c.w * 0.62, c.y + c.h * 0.6]);
+    let [fx, fy] = at[0];
+    for (let i = 1; i < 3; i++) {
+      const u = MOVE.go(seg(t, ONB.taps[i] - 0.14, ONB.taps[i] - 0.02));
+      fx = lerp(fx, at[i][0], u); fy = lerp(fy, at[i][1], u);
+    }
+    const press = ONB.taps.reduce((m, tt) => Math.max(m, Math.exp(-Math.abs(t - tt) * 30)), 0);
+    ctx.save(); ctx.globalAlpha *= fA * 0.32; ctx.fillStyle = UI.ink;
+    ctx.beginPath(); ctx.arc(fx, fy, pt(21) * (1 - 0.18 * press), 0, TAU); ctx.fill(); ctx.restore();
+  }
+  // your answer and Bub's
+  let y2 = L.onb.sent;
+  if (t >= ONB.sent) { drawMsg(ctx, mYou, W - pt(16) - mYou.W, y2, 'out', t, ONB.sent, { fill: C.blue, ink: '#fff', k: K, lift: 0.8 }); y2 += mYou.H + pt(10); }
+  typing(ctx, pt(16), y2, t, ONB.typing, ONB.reply - 0.05, { fill: '#FFFFFF', dot: UI.ink3, k: K });
+  if (t >= ONB.reply) drawMsg(ctx, mBub, pt(16), y2, 'in', t, ONB.reply, { fill: '#FFFFFF', ink: UI.ink, k: K, lift: 0.6 });
+  homeIndicator(ctx, 0, 0, W, SH, K, UI.ink);
+}
+
+function chipView(ctx, c, st, rank, t, tapT) {
+  const path = squirclePath(c.x, c.y, c.w, c.h, c.h / 2);
+  ctx.save(); ctx.shadowColor = 'rgba(11,27,63,0.08)'; ctx.shadowBlur = 8 * K; ctx.shadowOffsetY = 2 * K;
+  ctx.fillStyle = '#fff'; ctx.fill(path); ctx.restore();
+  if (st > 0) {
+    ctx.save(); ctx.clip(path); ctx.fillStyle = P[c.key].color;
+    ctx.beginPath(); ctx.arc(c.x + c.w * 0.62, c.y + c.h * 0.58, (c.w * 0.8) * st, 0, TAU); ctx.fill(); ctx.restore();
+  } else { ctx.lineWidth = 1.5 * K; ctx.strokeStyle = UI.chipStroke; ctx.stroke(path); }
+  text(ctx, c.label, c.x + 17 * K, c.y + c.h / 2 + 17.5 * K * 0.36, { f: FONTS.ui, w: 650, size: 17.5 * K, color: st > 0.5 ? P[c.key].text : UI.ink });
+  if (rank >= 0) {
+    const bp = spring(t - tapT - 0.03, SPRING.pop);
+    if (bp > 0.001) {
+      const bx = c.x + c.w - 4 * K, by = c.y + 3 * K;
+      about(ctx, bx, by, bp, bp, () => {
+        ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(bx, by, 13 * K, 0, TAU); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * K; ctx.stroke();
+        text(ctx, String(rank + 1), bx, by + 5 * K, { f: FONTS.ui, w: 800, size: 14 * K, color: '#fff', align: 'center' });
+      });
+    }
+  }
+}
+
+// Step 2's screen: you as an orb in your three colours, a radar pulsing out of you while Bub looks around.
+function matching(ctx, t) {
+  appSky(ctx);
+  topBar(ctx, t, { title: 'Bub', sub: T.bub.looking, avatar: bubAvatar(t, { look: [Math.sin(t * 6) * 0.8, 0], happy: 0, wide: 0.5 }), right: (c, x, y) => aiTag(c, x + 8 * K, y + 12 * K) });
+  const R = L.radar;
+  if (t >= MATCH.radar) {
+    for (let i = 0; i < 3; i++) {
+      const ph = ((t - MATCH.radar) / 0.9 + i / 3) % 1;
+      ctx.save(); ctx.globalAlpha *= (1 - ph) * 0.7;
+      ctx.strokeStyle = P.family.color; ctx.lineWidth = pt(2.2);
+      ctx.beginPath(); ctx.arc(W / 2, R.orb, pt(46) + ph * pt(150), 0, TAU); ctx.stroke(); ctx.restore();
+    }
+  }
+  // (your orb itself is liquid: orbLiquid)
+  text(ctx, T.you, W / 2, R.you, { f: FONTS.ui, w: 750, size: pt(17), color: UI.ink, align: 'center' });
+  text(ctx, PICKS.map((k) => P[k].label).join(' · '), W / 2, R.you + pt(24), { f: FONTS.ui, w: 600, size: pt(15), color: UI.ink2, align: 'center' });
+  homeIndicator(ctx, 0, 0, W, SH, K, UI.ink);
+}
+
+// The match: the one arrives (the camera pulls out of their orb), your two bubbles fly together and kiss into a
+// double bubble, and the app says why.
+// the match's two orbs, in screen design coordinates: they fly together and kiss into a double bubble (centres one
+// radius apart: Plateau's flat wall). The liquid layer draws them (matchLiquid), so the wall they share is real.
+function matchOrbs(t) {
+  const M = L.matched, r = M.r;
+  const come = seg(t, MATCH.back + 0.55, MATCH.kiss, MOVE.go);
+  const kissS = spring(t - MATCH.kiss, SPRING.wobble);
+  const d = t < MATCH.kiss ? lerp(2 * M.apart, 2 * r + pt(10), come) : lerp(2 * r + pt(10), r, kissS);
+  return { ax: W / 2 - d / 2, bx: W / 2 + d / 2, cy: M.cy, r, v: t < MATCH.kiss ? 0 : springVel(t - MATCH.kiss, SPRING.wobble) };
+}
+
+// The liquid of the phone shots. In the phone's world (its lens, its depth): the air (scenes/air.js), your picks
+// flying from the tags to the words and into your orb, and whatever the screen holds (your orb, the match); the
+// dive, the universe and SAME!! have lenses of their own. A screen's clip stays with its own primitives.
+function phoneLiquid(t) {
+  if (t >= ORB_TEAR[0] && t < MATCH.back) return t < ORB_TEAR[1] ? orbLiquid(t) : flightLiquid(t);
+  const base = t < ORB_TEAR[0] ? (t >= ONB.next ? orbLiquid(t) : null) : t < MATCH.next + 0.45 ? matchLiquid(t) : sameLiquid(t);
+  if (base && base.cam !== PHONE_CAM) return base;                   // SAME!! is placed on the frame: no air then
+  const own = (base?.prims ?? []).map((p) => (p.clip || !base.clip ? p : { ...p, clip: base.clip }));
+  return { prims: [...own, ...picksLiquid(t), ...airPrims(t, PHONE_CAM)], cam: PHONE_CAM, useDepth: true };
+}
+
+// Your three picks, as ink: each tag you tap lets go a bead of its colour, which lifts off the glass and floats to
+// the words, to sit after "…to you"; when Bub goes looking they fly into your orb as it arrives, and fill it.
+const PICK_R = 0.042;
+function picksLiquid(t) {
+  if (t < ONB.taps[0] || t > ONB.next + 0.75) return [];
+  const pose = phonePose(Math.min(t, ONB.next + 0.75));
+  const cf = capFrame(0), rpx = PICK_R / cf.w * stepCaps()[0].sg.w, slots = capBeads(0, PICKS.length, rpx);
+  const orbU = MOVE.go(seg(t, ONB.next, ONB.next + 0.42));
+  const orbAt = new THREE.Vector3(...toWorld(W / 2 + W * (1 - orbU), L.radar.orb));
+  const prims = [];
+  PICKS.forEach((key, i) => {
+    const c = chips.find((q) => q.key === key), t0 = ONB.taps[i] + 0.04;
+    if (t < t0) return;
+    const from = new THREE.Vector3(...toWorld(c.x + c.w * 0.62, c.y + c.h * 0.5, 0));
+    const lift = from.clone().add(new THREE.Vector3(0, 0, 0.12));
+    const slot = capPoint(0, ...slots[i]);
+    const go = MOVE.go(seg(t, t0 + 0.22, t0 + 1.0));
+    // off the glass, an arc up and over to the words (toward the lens a little on the way), then a bob at rest
+    const ctrl = lift.clone().lerp(slot, 0.5).add(new THREE.Vector3(0, 0.45, 0.35));
+    const q = 1 - go, p = lift.clone().multiplyScalar(q * q).addScaledVector(ctrl, 2 * q * go).addScaledVector(slot, go * go);
+    if (go < 1e-4) p.lerpVectors(from, lift, MOVE.go(seg(t, t0, t0 + 0.22)));
+    p.y += 0.012 * Math.sin(t * 3.2 + i * 2.1) * seg(t, t0 + 1.0, t0 + 1.3);
+    // into your orb as it arrives (merging: the orb's own group)
+    const into = MOVE.go(seg(t, ONB.next + 0.08 + i * 0.07, ONB.next + 0.6 + i * 0.07));
+    if (into > 0) p.lerp(orbAt, into);
+    const born = spring(t - t0, SPRING.pop);
+    const r = PICK_R * born * (1 - 0.85 * smoothstep(0.7, 1, into));
+    if (r < 0.002) return;
+    prims.push({ ...INK_ORB, ...inkOf([P[key].color]), pos: V3(p), size: [r], seed: 2 + i, group: 31, k: 0.05 * into });
+  });
+  return prims;
+}
+const V3 = (v) => [v.x, v.y, v.z];
+
+// → the liquid for step 2's screen: your orb rides in with the push (a clear bubble that fills with your three inks),
+// the camera dives into it, and its film tears open from the middle as the camera goes through into the universe
+const ORB_TEAR = [FLY0 - 0.03, FLY0 + 0.17];
+function orbLiquid(t) {
+  if (t >= ORB_TEAR[1]) return null;
+  const tp = Math.min(t, FLY0 - 1e-3);
+  const pose = phonePose(tp);
+  const pop = spring(t - ONB.next - 0.1, SPRING.pop);
+  const R = pt(46) * (0.85 + 0.15 * pop);                          // design px
+  if (t >= ORB_TEAR[0]) {
+    // the dive ends with the orb filling the frame; its film tears open from the middle as the camera goes through (in
+    // frame space: the universe's lens takes over at FLY0)
+    const [x, y, k] = projectScreen(pose, W / 2, L.radar.orb);
+    return { prims: [{ ...INK_ORB, ...inkOf(YOU_COLORS), type: 'shell', pop: seg(t, ...ORB_TEAR, ease.inQuad), popDir: [0.05, 0.1, 1], pos: sp(x, y), size: [sr(R * k)], seed: 1.3, group: 31 }] };
+  }
+  const u = MOVE.go(seg(t, ONB.next, ONB.next + 0.42));            // the iOS push in from the right (screen())
+  const x = W / 2 + W * (1 - u), y = L.radar.orb;
+  const born = seg(t, ONB.next + 0.15, ONB.next + 0.6, MOVE.in);
+  // a bubble on the glass (a dome: half of it under the glass, as a bubble resting on a wet surface)
+  const orb = { ...INK_ORB, ...inkOf(YOU_COLORS), pos: toWorld(x, y), size: [R * worldPerPx], fill: 0.95 * born, seed: 1.3, group: 31 };
+  // the matching screen slides in over the last one: the orb shows only on it
+  const clip = u < 1 ? [projectScreen(pose, W * (1 - u), y)[0], -1e5, 1e5, 1e5] : null;
+  return { prims: [orb], clip, cam: PHONE_CAM, useDepth: true };
+}
+
+// → the liquid for step 2's flight, in the universe's world (its camera, the crowd's depth): Bub, a soap bubble with
+// his face; the two people he checks and the one, their inks in a soap skin; a gold glass ring that locks on the one
+// when he finds them; and the rush, which ends inside their film (their inks fill the frame on both sides of the cut)
+const LOCK = { in: MATCH.found + 0.06, out: MATCH.rush - 0.1 };
+const _up = new THREE.Vector3(0, 1, 0);
+function flightLiquid(t) {
+  if (t < ORB_TEAR[1]) return null;
+  const rig = flightRig(t), cam = U.camera;
+  cam.updateMatrixWorld();
+  const V = (v) => [v.x, v.y, v.z];
+  const squashed = (dir, k) => ({ quat: quatFromY(V(dir.clone().normalize())), scale: [1 - k / 2, 1 + k, 1 - k / 2] });
+  const prims = [];
+  // the one; the camera's rush into them
+  const toOne = cam.position.distanceTo(rig.one), inside = 1 - smoothstep(rig.oneR * 0.97, rig.oneR * 1.35, toOne);
+  if (toOne > rig.oneR * 1.0) {
+    prims.push({ ...INK_ORB, ...inkOf(OTTER_COLORS), pos: V(rig.one), size: [rig.oneR], ...squashed(rig.oneSquashDir, rig.oneSquash),
+      glow: 0.15 + 0.45 * rig.glow, seed: 4.1, group: 51, wobble: 0.006 + 0.02 * rig.oneWob });
+  }
+  rig.cand.forEach((c, i) => {
+    if (c.vis > 0.01) prims.push({ ...INK_ORB, ...inkOf(CANDS[i].colors), pos: V(c.pos), size: [c.r], ...squashed(c.squashDir, c.squash), alpha: c.vis, seed: 2.3 + i * 1.7, group: 52 + i });
+  });
+  // the lock: a gold glass ring snaps round the one when Bub reaches them
+  if (t >= LOCK.in && t < LOCK.out + 0.25) {
+    const p = spring(t - LOCK.in, SPRING.pop), out = seg(t, LOCK.out, LOCK.out + 0.25, MOVE.out);
+    const ax = cam.position.clone().sub(rig.one).normalize();
+    prims.push({ type: 'torus', pos: V(rig.one), size: [rig.oneR * (1.55 - 0.23 * p), rig.oneR * 0.075], quat: quatFromY(V(ax)), glass: 1, tint: C.gold, tintAmt: 0.6,
+      fill: 0.35, haze: 0.06, frost: 0.15, refr: 0.035, spec: 1, edge: 0.45, glow: 0.5, env: 1.1, alpha: Math.min(1, p * 3) * (1 - out), group: 60 });
+  }
+  // Bub: his face where he looks, never turned so far that we lose his eyes; the head shake turns it
+  const f = rig.face, toCam = cam.position.clone().sub(rig.bub).normalize();
+  const g = f.gaze.clone().normalize(), dd = g.dot(toCam);
+  if (dd < 0.6) g.addScaledVector(toCam, 0.6 - dd).normalize();
+  if (f.shake) g.applyAxisAngle(_up, f.shake);
+  const B = bubPrim({ pos: V(rig.bub), r: rig.bubR, faceDir: V(g), squash: f.squashK, squashDir: V(f.squashDir), blink: f.blink, happy: f.happy,
+    wide: f.wide, squint: f.squint, look: f.look, blush: f.blush, group: 50, k: 0 });
+  prims.push(B.prim);
+  // inside their film: a sheet of their inks against the lens
+  if (inside > 0.002) {
+    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion), at = cam.position.clone().addScaledVector(fwd, 0.3);
+    prims.push({ ...INK_ORB, ...inkOf(OTTER_COLORS), type: 'wall', pos: V(at), size: [0.28], quat: quatFromZ(V(fwd.clone().negate())), alpha: inside, seed: 4.1, group: 61 });
+  }
+  return { prims, face: B.face, cam: '3d', useDepth: true, bloom: { strength: 0.32, threshold: 1.05, radius: 0.55 } };
+}
+
+// → the liquid for the match: your orb and theirs on the phone's screen, following its pose and the push to the chat
+function matchLiquid(t) {
+  const pose = phonePose(t);
+  const u = MOVE.go(seg(t, MATCH.next, MATCH.next + 0.42));        // the iOS push to the chat (screen())
+  const o = matchOrbs(t), dx = -W * 0.3 * u;
+  const sq = clamp(o.v * 0.035, -0.16, 0.16);                         // they flatten into each other on the kiss
+  const scale = [1 - sq, 1 + sq * 0.5, 1 + sq * 0.5], R = o.r * worldPerPx;
+  const prims = [
+    { ...INK_ORB, ...inkOf(YOU_COLORS), pos: toWorld(o.ax + dx, o.cy), size: [R], scale, seed: 1.3, group: 21 },
+    { ...INK_ORB, ...inkOf(OTTER_COLORS), pos: toWorld(o.bx + dx, o.cy), size: [R], scale, seed: 4.1, group: 22 },
+  ];
+  const d = o.bx - o.ax;
+  if (d < 2 * o.r - 0.5) prims.push({ ...WALL, pos: toWorld((o.ax + o.bx) / 2 + dx, o.cy), size: [Math.sqrt(o.r * o.r - d * d / 4) * worldPerPx], quat: quatFromZ([1, 0, 0]), group: 23 });
+  // the chat screen slides in over the match: the liquid shows only left of its edge
+  const clip = u > 0 ? [projectScreen(pose, 0, o.cy)[0], -1e5, projectScreen(pose, W * (1 - u), o.cy)[0], 1e5] : null;
+  return { prims, clip, cam: PHONE_CAM, useDepth: true };
+}
+
+function matched(ctx, t) {
+  appSky(ctx);
+  const M = L.matched, r = M.r;
+  const lab = seg(t, MATCH.kiss + 0.15, MATCH.kiss + 0.4);
+  ctx.save(); ctx.globalAlpha *= lab;
+  text(ctx, T.you, W / 2 - r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
+  text(ctx, T.otter, W / 2 + r * 1.05, M.labels, { f: FONTS.ui, w: 700, size: pt(16), color: UI.ink2, align: 'center' });
+  ctx.restore();
+  drawLine(ctx, hero1, centerX(hero1, W / 2), M.hero1, { fill: UI.ink, each: popEach(hero1, t, [MATCH.line, MATCH.line + 0.1]) });
+  drawLine(ctx, hero2, centerX(hero2, W / 2), M.hero2, { fill: C.blue, each: popEach(hero2, t, [MATCH.line + 0.35, MATCH.line + 0.45, MATCH.line + 0.55]) });
+  const bp = spring(t - (MATCH.sayhi - 0.55), SPRING.pop);
+  if (bp > 0.001) {
+    const press = 1 - 0.12 * Math.sin(clamp((t - MATCH.sayhi + 0.05) / 0.16) * Math.PI);
+    const cyB = M.sayhi + M.sayhiH / 2;
+    about(ctx, W / 2, cyB, bp * press, bp * press, () => {
+      ctx.fillStyle = C.blue; ctx.fill(squirclePath(W / 2 - pt(105), M.sayhi, pt(210), M.sayhiH, M.sayhiH / 2));
+      text(ctx, T.sayHi, W / 2, cyB + pt(7), { f: FONTS.ui, w: 750, size: pt(19), color: '#FFFFFF', align: 'center' });
+    });
+    const u = (t - MATCH.sayhi + 0.1) / 0.36;
+    if (u > 0 && u < 1) { ctx.save(); ctx.globalAlpha *= Math.sin(u * Math.PI) * 0.32; ctx.fillStyle = UI.ink; ctx.beginPath(); ctx.arc(W / 2 + pt(30), cyB + pt(4), pt(22) * (1 - 0.15 * Math.sin(u * Math.PI)), 0, TAU); ctx.fill(); ctx.restore(); }
+  }
+  homeIndicator(ctx, 0, 0, W, SH, K, UI.ink);
+}
+
+// Over the phone: SAME!! bursting out of the chat; the day counter.
+// SAME!! bursting out of the chat: where it is at t (frame px) — the blue chat bubble grows out of the phone to hero
+// size and comes back
+function sameAt(t, pose) {
+  const sb = t - CHAT.sameBurst;
+  if (sb <= -0.05 || t >= CHAT.sameBack + 0.35) return null;
+  const grow = ease.outBack(clamp((sb + 0.05) / 0.32), 2.2), shrink = seg(t, CHAT.sameBack, CHAT.sameBack + 0.35, MOVE.out);
+  const [mx, my] = projectScreen(pose, L.chat.same[0], L.chat.same[1]);
+  return { sb, cx: lerp(mx, W / 2, grow * (1 - shrink)), cy: lerp(my, 1000, grow * (1 - shrink)), s: lerp(0.2, 1, grow) * (1 - 0.8 * shrink), a: 1 - shrink * 0.8 };
+}
+// → the liquid for SAME!!: the chat bubble is a real bubble — a glossy blue jelly slab that wobbles as it lands, with
+// bubbles in your colours and theirs splashing out round it
+const SAME_INK = [C.blue, '#2A5BFF', '#1A45D8'];
+function sameLiquid(t) {
+  const m = sameAt(t, phonePose(t));
+  if (!m) return null;
+  const { sb, cx, cy, s, a } = m;
+  const wob = 0.07 * Math.sin(Math.max(0, sb) * 19) * Math.exp(-Math.max(0, sb) * 4.5);
+  const w = (same.width + 120) / 2 * s, h = (same.ascent + 140) / 2 * s;
+  // the brand blue at full strength under a clear skin, so the white word on it keeps its contrast
+  const prims = [{ ...INK_ORB, ...inkOf(SAME_INK), type: 'box', pos: sp(cx, cy), size: [sr(w), sr(h), sr(Math.min(w, h) * 0.55)], round: sr(Math.min(120 * s, h)),
+    scale: [1 + wob, 1 - wob, 1], fill: 1, glow: 0, haze: 0, rim: 0.2, edge: 0.2, env: 0.65, tintAmt: 0.85, alpha: a, seed: 2.2, group: 70 }];
+  for (let i = 0; i < 14; i++) {
+    const ang = (i / 14) * TAU + 0.2 + sb * 0.8, rr = (330 + (i % 2) * 70 + sb * 60) * s;
+    prims.push({ ...INK_ORB, ...inkOf(i % 2 ? YOU_COLORS : SAME_INK), pos: sp(cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr * 0.8), size: [sr((26 + (i % 3) * 13) * s)],
+      alpha: a, seed: i * 1.37, group: 71 + i });
+  }
+  return { prims };
+}
+
+function overlays(ctx, t, pose) {
+  const m = sameAt(t, pose);
+  if (m) {
+    // (the bubble itself is liquid: sameLiquid) its word, white on it
+    about(ctx, m.cx, m.cy, m.s, m.s, () => {
+      ctx.save(); ctx.globalAlpha *= m.a;
+      drawLine(ctx, same, centerX(same, m.cx), m.cy + same.ascent / 2, { fill: '#fff', each: waveEach(same, t, CHAT.sameBurst + 0.08, { amp: 0.14 }) });
+      ctx.restore();
+    });
+  }
+}
+
+
+// ── The flight (3D) ──────────────────────────────────────────────────────────────────────────────────────────────
+// The camera bursts out of your orb into the universe and Bub swoops past it into the crowd, shouldering bubbles
+// aside (the crowd's shader is pushed by Bub's position). It looks around; checks someone ("💰 Wealth first"): no, not
+// this one (a head shake); someone else ("💪 Health first"): no; it takes a breath and sends out a scan — everyone who
+// puts family first lights up — spots the one, dashes over and bumps them: yes! ("👨‍👩‍👧 Family first"). Then the
+// camera rushes into their bubble, which is their orb in the app when the phone comes back.
+const Z_START = -18;
+// the camera's speed along the path (units/s), eased between keys: it races in, slows to watch each check, darts
+// after Bub to the one, then drifts while they celebrate
+const V_KEYS = [
+  [FLY0, 26], [FLY0 + 0.45, 11], [MATCH.fly + 0.75, 5], [MATCH.cand1 - 0.1, 1.5], [MATCH.nope1 + 0.45, 1.5],
+  [MATCH.nope1 + 0.65, 4.5], [MATCH.cand2 - 0.1, 1.5], [MATCH.nope2 + 0.35, 1.3], [MATCH.spot, 1.1],
+  [MATCH.spot + 0.3, 7], [MATCH.found - 0.2, 3], [MATCH.found + 0.15, 0.35], [MATCH.back, 0.35],
+];
+const vAt = (t) => {
+  if (t <= V_KEYS[0][0]) return V_KEYS[0][1];
+  for (let i = 1; i < V_KEYS.length; i++) {
+    const [t1, v1] = V_KEYS[i];
+    if (t <= t1) { const [t0, v0] = V_KEYS[i - 1]; return lerp(v0, v1, smoothstep(t0, t1, t)); }
+  }
+  return V_KEYS[V_KEYS.length - 1][1];
+};
+const DT = 1 / 480, ZT = [];
+for (let t = FLY0, z = Z_START; t <= MATCH.back + 0.5; t += DT) { ZT.push(z); z -= vAt(t) * DT; }
+function camZ(t) {
+  const f = (Math.max(t, FLY0) - FLY0) / DT, i = Math.min(ZT.length - 2, Math.floor(f));
+  return lerp(ZT[i], ZT[i + 1], Math.min(1, f - i));
+}
+const P3 = (z, dx = 0, dy = 0) => new THREE.Vector3(PATH.x(z) + dx, PATH.y(z) + dy, z);
+
+// the cast of the search, placed in the world where the camera will be watching when Bub gets to them
+const CAND = [
+  { at: MATCH.cand1, nope: MATCH.nope1, base: P3(camZ(MATCH.cand1) - 4.2, 1.3, -0.2), r: 0.62, key: 'wealth', side: 1 },
+  { at: MATCH.cand2, nope: MATCH.nope2, base: P3(camZ(MATCH.cand2) - 4.4, -1.25, 0.45), r: 0.58, key: 'health', side: -1 },
+];
+const ONE = { base: P3(camZ(MATCH.found) - 5.0, 0.95, 0.25), r: 0.78 };
+const BUB_R = 0.55;
+const _toCam = new THREE.Vector3();
+const UP = new THREE.Vector3(0, 1, 0);
+
+// the path's own frame at the camera's depth (forward, right, up): Bub's chase position hangs off it
+function pathFrame(t) {
+  const z = camZ(t);
+  const pos = P3(z), fwd = P3(z - 7).sub(pos).normalize();
+  const right = new THREE.Vector3().crossVectors(fwd, UP).normalize(), up = new THREE.Vector3().crossVectors(right, fwd);
+  return { z, pos, fwd, right, up };
+}
+// a short damped bump: 0 → 1 at contact (~0.1 s) and back, ringing once
+const bumpAt = (k) => (k > 0 && k < 0.7 ? Math.sin(Math.PI * clamp(k / 0.2)) * Math.exp(-k * 3.5) + (k > 0.2 ? -0.25 * Math.sin((k - 0.2) * 18) * Math.exp(-(k - 0.2) * 7) : 0) : 0);
+
+// where Bub hovers to look at someone: between them and the camera, on the path side, touching when `gap` < 0
+function besideOf(c, cr, gap) {
+  const inward = P3(c.z).sub(c); inward.z = 0; inward.normalize();
+  const dir = inward.multiplyScalar(0.8).add(new THREE.Vector3(0, -0.1, 0.62)).normalize();
+  return { pos: c.clone().addScaledVector(dir, cr + BUB_R + gap), dir };
+}
+
+function candState(i, t) {
+  const c = CAND[i];
+  const bump = bumpAt(t - c.at);
+  const { dir } = besideOf(c.base, c.r, 0);
+  // after the no it drifts back into the crowd
+  const away = MOVE.go(seg(t, c.nope + 0.3, c.nope + 1.3));
+  const pos = c.base.clone().addScaledVector(dir, -0.14 * bump);
+  pos.x += c.side * 0.9 * away; pos.z -= 0.8 * away; pos.y += 0.25 * away;
+  return { pos, r: c.r * (1 - 0.06 * away), vis: 1 - 0.35 * away, squash: -0.16 * bump, squashDir: dir, wob: Math.abs(bump), dir };
+}
+
+function oneState(t) {
+  const bump = bumpAt(t - MATCH.found);
+  const { dir } = besideOf(ONE.base, ONE.r, 0);
+  const hop = Math.sin(Math.PI * seg(t, MATCH.found + 0.55, MATCH.found + 0.9)) * 0.12;   // a little "hi!" bounce
+  const pos = ONE.base.clone().addScaledVector(dir, -0.16 * bump);
+  pos.y += hop;
+  return { pos, r: ONE.r * (1 + 0.06 * Math.max(0, bump) + 0.03 * Math.sin(t * 7) * seg(t, MATCH.spot, MATCH.spot + 0.4)), squash: -0.14 * bump, squashDir: dir, wob: Math.abs(bump) };
+}
+
+// Bub's position, a chain of poses blended in time (each later pose takes over from whatever came before)
+function bubPos(t) {
+  const F = pathFrame(t);
+  const camP = F.pos;
+  const chase = camP.clone().addScaledVector(F.fwd, 3.1).addScaledVector(F.right, -0.12).addScaledVector(F.up, -0.6 + 0.05 * Math.sin(t * 4.3));
+  // enter: from beside and behind the camera (off frame), swooping past it into the chase spot
+  const behind = camP.clone().addScaledVector(F.right, 1.1).addScaledVector(F.up, -0.8).addScaledVector(F.fwd, -0.4);
+  const en = MOVE.in(seg(t, MATCH.fly, MATCH.fly + 0.5));
+  let p = behind.lerp(chase, en);
+  p.addScaledVector(F.up, Math.sin(Math.PI * en) * 0.35);
+  // the two checks: fly over (arcing up), bump them, hover, leave after the no
+  for (let i = 0; i < 2; i++) {
+    const c = CAND[i];
+    const go = MOVE.go(seg(t, c.at - 0.42, c.at));
+    const leave = MOVE.go(seg(t, c.nope + 0.3, c.nope + 0.62));
+    const w = go * (1 - leave);
+    if (w <= 0) continue;
+    const gap = lerp(0.35, 0.06, go) - 0.13 * Math.max(0, bumpAt(t - c.at));
+    const cs = candState(i, t);
+    const b = besideOf(cs.pos, cs.r, gap).pos;
+    b.y += Math.sin(Math.PI * go) * 0.3 * (1 - leave) + Math.sin(Math.PI * leave) * 0.2;
+    p.lerp(b, w);
+  }
+  // the scan: it rises a little into the middle of the frame and takes a breath
+  const sc = MOVE.go(seg(t, MATCH.scan - 0.35, MATCH.scan));
+  p.addScaledVector(F.up, 0.28 * sc * (1 - seg(t, MATCH.spot, MATCH.spot + 0.3)));
+  // the dash: a beat to aim, then a whip over to the one, bumping them on the downbeat
+  const dash = MOVE.whip(seg(t, MATCH.spot + 0.12, MATCH.found));
+  if (dash > 0) {
+    const os = oneState(t);
+    const gap = 0.05 - 0.16 * Math.max(0, bumpAt(t - MATCH.found));
+    const b = besideOf(os.pos, os.r, gap).pos;
+    b.y += Math.sin(Math.PI * dash) * 0.45;
+    // celebrate: a hop off them, then it settles beside them
+    const hop = spring(t - MATCH.found - 0.35, SPRING.wobble);
+    b.y += Math.sin(Math.PI * clamp((t - MATCH.found - 0.35) / 0.45)) * 0.4;
+    b.addScaledVector(F.right, -0.18 * hop);
+    p.lerp(b, dash);
+  }
+  // never let the camera catch it up (once it is in front): at least 2.3 units ahead along the path
+  if (t > MATCH.fly + 0.5) {
+    const ahead = p.clone().sub(camP).dot(F.fwd);
+    if (ahead < 2.3) p.addScaledVector(F.fwd, 2.3 - ahead);
+  }
+  // the rush: it steps aside, out of the camera's way
+  const ru = MOVE.go(seg(t, MATCH.rush - 0.2, MATCH.rush + 0.4));
+  p.addScaledVector(F.right, -2.6 * ru).addScaledVector(F.up, 0.5 * ru);
+  return p;
+}
+
+// the face: where it looks (key directions, quick head turns between them) and its expression
+function bubFace(t, bub, cam, one, cs) {
+  const F = pathFrame(t);
+  const toCam = cam.clone().sub(bub).normalize();
+  const at = (v) => v.clone().sub(bub).normalize();
+  const keys = [
+    [MATCH.fly - 1, toCam, 0.1],
+    [MATCH.fly + 0.5, F.fwd.clone().addScaledVector(F.right, -1.1).addScaledVector(F.up, 0.15), 0.12],   // looks left
+    [MATCH.fly + 0.78, F.fwd.clone().addScaledVector(F.right, 1.1).addScaledVector(F.up, 0.35), 0.12],   // …right
+    [MATCH.cand1 - 0.45, at(cs[0].pos), 0.14],                                                              // oh — them?
+    [MATCH.nope1 + 0.5, F.fwd.clone().addScaledVector(F.right, -0.8).addScaledVector(F.up, 0.4), 0.14],
+    [MATCH.cand2 - 0.45, at(cs[1].pos), 0.14],
+    [MATCH.nope2 + 0.45, toCam, 0.16],                                                                       // hmm.
+    [MATCH.scan - 0.1, F.fwd.clone().addScaledVector(F.up, 0.3), 0.14],
+    [MATCH.spot, at(one), 0.1],                                                                              // THERE
+    [MATCH.found + 0.95, toCam, 0.18],                                                                       // found them!
+    [MATCH.rush, at(one), 0.2],
+  ];
+  let g = keys[0][1].clone();
+  for (let i = 1; i < keys.length; i++) {
+    const [t0, dir, dur] = keys[i];
+    if (t < t0) break;
+    g.lerp(dir.clone().normalize(), MOVE.go(seg(t, t0, t0 + dur))).normalize();
+  }
+  const shakeOf = (t0) => { const k = t - t0; return k > 0 && k < 0.5 ? 0.45 * Math.sin(k * TAU * 5) * (1 - k / 0.5) : 0; };
+  const inspect = (i) => seg(t, CAND[i].at + 0.1, CAND[i].at + 0.25) * (1 - seg(t, CAND[i].nope + 0.45, CAND[i].nope + 0.6));
+  const nope = (i) => seg(t, CAND[i].nope - 0.05, CAND[i].nope + 0.05) * (1 - seg(t, CAND[i].nope + 0.45, CAND[i].nope + 0.6));
+  const happy = t > MATCH.found + 0.06 && t < MATCH.rush + 0.4 ? 1 : 0;
+  return {
+    gaze: g,
+    shake: shakeOf(MATCH.nope1) + shakeOf(MATCH.nope2),
+    squint: Math.max(0.35 * Math.max(inspect(0), inspect(1)), 0.75 * Math.max(nope(0), nope(1))),
+    wide: t >= MATCH.spot && t < MATCH.found + 0.06 ? 1 : t >= MATCH.fly && t < MATCH.fly + 0.45 ? 0.7 : 0.3,
+    happy,
+    blush: 0.5 + 0.6 * happy,
+    blink: blinkAt(t, [MATCH.fly + 0.95, MATCH.nope2 + 0.6, MATCH.found + 1.5]),
+    look: [0, 0.15 * Math.max(inspect(0), inspect(1))],
+  };
+}
+
+function flightRig(t) {
+  const F = pathFrame(t);
+  const cand = [candState(0, t), candState(1, t)];
+  const os = oneState(t);
+  const bub = bubPos(t);
+  // velocity → stretch along the motion; contact → squash along the contact
+  const h = 1 / 240, vel = bubPos(t + h).sub(bubPos(t - h)).divideScalar(2 * h);
+  const speed = vel.length();
+  let squashDir = speed > 1e-3 ? vel.clone().normalize() : UP.clone(), squashK = clamp(speed * 0.045, 0, 0.32);
+  for (const [k, dir] of [[t - CAND[0].at, cand[0].dir], [t - CAND[1].at, cand[1].dir], [t - MATCH.found, os.squashDir]]) {
+    const b = bumpAt(k);
+    if (Math.abs(b) > 0.02) { squashDir = dir; squashK = -0.22 * b; }
+  }
+  // the camera: on the path, a little bob; it looks at whatever Bub is busy with
+  let cam = F.pos.clone().addScaledVector(F.up, 0.04 * Math.sin(t * 2.7));
+  const ahead = P3(F.z - 7);
+  let look = ahead.clone().lerp(bub, 0.3);
+  for (let i = 0; i < 2; i++) {
+    const w = MOVE.go(seg(t, CAND[i].at - 0.5, CAND[i].at - 0.05)) * (1 - MOVE.go(seg(t, CAND[i].nope + 0.45, CAND[i].nope + 0.85)));
+    look.lerp(bub.clone().lerp(cand[i].pos, 0.5), w);
+  }
+  look.lerp(bub.clone().addScaledVector(F.fwd, 2), MOVE.go(seg(t, MATCH.scan - 0.4, MATCH.scan)));
+  const turn = MOVE.go(seg(t, MATCH.spot, MATCH.spot + 0.5));
+  look.lerp(bub.clone().lerp(os.pos, 0.5), turn);
+  // the rush into the one
+  const rush = ease.inExpo(seg(t, MATCH.rush, MATCH.back));
+  if (rush > 0) {
+    cam.lerp(os.pos.clone().add(cam.clone().sub(os.pos).normalize().multiplyScalar(0.9 * os.r)), rush);
+    look.lerp(os.pos, Math.min(1, rush * 3));
+  }
+  const curv = PATH.x(F.z - 7) - 2 * PATH.x(F.z - 3.5) + PATH.x(F.z);
+  const face = bubFace(t, bub, cam, os.pos, cand);
+  const breath = Math.sin(Math.PI * seg(t, MATCH.scan - 0.3, MATCH.scan + 0.15)) * 0.12;
+  const sigh = Math.sin(Math.PI * seg(t, MATCH.nope2 + 0.1, MATCH.nope2 + 0.5)) * 0.06;
+  return {
+    cam, look, roll: curv * 0.35 * (1 - turn) + 0.05 * Math.sin(Math.PI * seg(t, MATCH.spot + 0.12, MATCH.found)),
+    bub, bubR: BUB_R * (1 + breath - sigh) * lerp(0.6, 1, MOVE.in(seg(t, MATCH.fly, MATCH.fly + 0.3))),
+    face: { ...face, squashDir, squashK },
+    cand, one: os.pos, oneR: os.r, oneSquash: os.squash, oneSquashDir: os.squashDir, oneWob: os.wob,
+    glow: seg(t, MATCH.spot, MATCH.spot + 0.4) + 0.6 * Math.exp(-Math.max(0, t - MATCH.found) * 3) * (t > MATCH.found ? 1 : 0),
+    scanAt: t < MATCH.scan ? bub : bubPos(MATCH.scan),
+  };
+}
+
+function flightOverlay(ctx, t) {
+  const rig = flightRig(t);
+  const cam = U.camera;
+  // your orb bursts: the camera came in through it
+  const k = t - FLY0;
+  if (k < 0.5) {
+    for (const q of shards) {
+      const ang = Math.atan2(q.vy, q.vx);
+      const p = particleAt(q, W / 2 + Math.cos(ang) * 600, 960 + Math.sin(ang) * 600, k, 600, 2.4);
+      if (p.a > 0) drawDroplet(ctx, p.x, p.y, q.size * 0.7, q.vx, q.vy, p.a * (1 - seg(k, 0.2, 0.5)));
+    }
+    ctx.save(); ctx.globalAlpha *= 1 - seg(k, 0, 0.45);
+    ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = Math.max(1, 18 * (1 - k * 2));
+    ctx.beginPath(); ctx.arc(W / 2, 960, 640 + 900 * MOVE.in(seg(k, 0, 0.45)), 0, TAU); ctx.stroke(); ctx.restore();
+  }
+  // (who each of them is hangs under their bubble, in the universe: flightLabels)
+  // the scan: rings out of Bub
+  const sk = t - MATCH.scan;
+  if (sk > 0 && sk < 1.3) {
+    const [sx, sy] = project(cam, rig.scanAt);
+    for (const [d, col, w] of [[0, P.family.color, 14], [0.14, '#FFFFFF', 8]]) {
+      const u = clamp((sk - d) / 1.1);
+      if (u <= 0 || u >= 1) continue;
+      ctx.save(); ctx.globalAlpha *= (1 - u) * 0.85;
+      ctx.strokeStyle = col; ctx.lineWidth = w * (1 - u) + 2;
+      ctx.beginPath(); ctx.arc(sx, sy, 60 + 1600 * MOVE.in(u), 0, TAU); ctx.stroke(); ctx.restore();
+    }
+  }
+  // the one: a glint when Bub spots them; a ping, sparkles and their callout when it reaches them
+  const [ox, oy, orr, oz] = project(cam, rig.one, rig.oneR);
+  if (oz < 1) {
+    const gk = t - MATCH.spot;
+    if (gk > 0 && gk < 0.6) {
+      const s = Math.sin(Math.PI * gk / 0.6);
+      ctx.save(); ctx.globalAlpha *= s; ctx.fillStyle = '#FFFFFF';
+      const gx = ox - orr * 0.45, gy = oy - orr * 0.5, L = 70 * s;
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + gk * 2, rr = i % 2 ? L * 0.16 : L; ctx[i ? 'lineTo' : 'moveTo'](gx + Math.cos(a) * rr, gy + Math.sin(a) * rr); }
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    const fk = t - MATCH.found;
+    if (fk > 0 && fk < 0.8) {
+      ctx.save(); ctx.globalAlpha *= 1 - fk / 0.8;
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 10;
+      ctx.beginPath(); ctx.arc(ox, oy, orr * (1.05 + 1.5 * MOVE.in(fk / 0.8)), 0, TAU); ctx.stroke(); ctx.restore();
+      for (const q of sparks) {
+        const p = particleAt(q, ox, oy, fk, 900, 2.6);
+        if (p.a <= 0) continue;
+        ctx.save(); ctx.globalAlpha *= p.a * (1 - fk / 0.8); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = q.color;
+        ctx.fill(squirclePath(-q.size * 0.5, -q.size * 0.18, q.size, q.size * 0.36, q.size * 0.18)); ctx.restore();
+      }
+    }
+  }
+}
+
+// The search's labels: who each person is (their top priority), hanging under their bubble in the universe — no pill,
+// no shadow: a sign at their depth that moves with them, depth-tested with the crowd. It pops in when Bub reaches
+// them, shakes on the no and is gone; the one's stays to the rush.
+let LABELS = null;
+const _dn = new THREE.Vector3(), _rt = new THREE.Vector3();
+function flightLabels(t, rig, cam) {
+  LABELS ??= [...CAND.map((c) => c.key), 'family'].map((key) => {
+    const label = `${P[key].emoji}  ${fill(T.first, { p: P[key].label })}`;
+    const w = Math.ceil(measureStr(label, { f: FONTS.ui, w: 750, s: 54 }) + 40), sg = sign({ w, h: 96 });
+    sg.label = label;
+    return sg;
+  });
+  const tanH = Math.tan((cam.fov * Math.PI) / 360);
+  const show = (sg, pos, r, p, alpha, shake, below = 1.08) => {
+    if (p <= 0.001 || alpha <= 0.002) { sg.hide(U.scene); return; }
+    // drawn each frame it shows (the same pixels; the reading check logs what is drawn)
+    sg.draw((g) => text(g, sg.label, sg.w / 2, 66, { f: FONTS.ui, w: 750, size: 54, color: C.ink, align: 'center' }));
+    _dn.set(0, -1, 0).applyQuaternion(cam.quaternion); _rt.set(1, 0, 0).applyQuaternion(cam.quaternion);
+    const at = pos.clone().addScaledVector(_dn, r * below + 0.16).addScaledVector(_rt, shake * 0.06);
+    const D = depthOf(cam, at), wpp = ((2 * D * tanH) / H) * p;
+    sg.place(U.scene, { pos: at.addScaledVector(_dn, -(1 - p) * 0.1), quat: cam.quaternion, wpp }, { order: 52, alpha });
+  };
+  CAND.forEach((c, i) => {
+    const p = spring(t - c.at - 0.08, SPRING.pop), out = seg(t, c.nope + 0.5, c.nope + 0.7, MOVE.out);
+    const shake = t > c.nope && t < c.nope + 0.4 ? Math.sin((t - c.nope) * 50) * (1 - (t - c.nope) / 0.4) : 0;
+    show(LABELS[i], rig.cand[i].pos, rig.cand[i].r, p, 1 - out, shake);
+  });
+  const lp = spring(t - MATCH.found - 0.05, SPRING.pop) * (1 - seg(t, MATCH.back - 0.2, MATCH.back - 0.08));
+  show(LABELS[2], rig.one, rig.oneR, lp, 1, 0, 1.62);             // below the gold ring that locks on them
+}

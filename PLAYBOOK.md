@@ -38,6 +38,12 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 - A word that has fully formed holds long enough to land (~1.5 s at a scene's key line). [05]
 - Type lives in the scene (occluded, lit, refracted, carved, revealed by light), never slapped on top. Effects on type
   settle before the read; type is tinted with a solid colour, never alpha. [05, 06]
+- Light and shadow do not integrate type that still sits in a band: place each line by its subject, not by the frame —
+  beside it (the phone turned toward its words), on it (written on the wall), under it (a label hanging from its
+  bubble), inside it (words among the crowd) or behind it (the faces' crowns over the words' feet) — in the shot's own
+  space and lens, moved by the scene's events. No caption band, plate, badge, drop shadow or fog behind type, and the
+  product is never faded to make room for words. Check a contact sheet of every text moment: a frame that reads
+  "headline over picture" is not done. [06]
 
 ## Pace, motion and transitions
 
@@ -63,7 +69,8 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 ## Product, brand and devices
 
 - Product UI is shown large, rebuilt at film scale, with camera push-ins on what matters. [02, 04]
-- A real device, whole, then the camera pushes in; never a cropped or oddly sized phone. [06]
+- A real device, whole, then the camera pushes in; never a cropped or oddly sized phone. A phone has a phone's
+  proportions (an iPhone 16 Pro's screen is 402 × 874 pt, 19.5 : 9), never the video frame's 9 : 16. [06]
 - A client's brand is followed exactly from its brand files (palette, type, shapes); the devil is in the details. [03]
 - A conceptual logo payoff beats a logo card (reel 03's chart → negative space → mark). [03]
 

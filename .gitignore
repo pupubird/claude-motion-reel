@@ -55,3 +55,10 @@ projects/almostfriends/audio/*.wav
 projects/almostfriends/audio/music/*.wav
 projects/almostfriends/audio/music/*.log
 projects/almostfriends/docs/storyboard/
+
+# almost friends — special edition. v6 plays the released film's mix, so it has no audio of its own. v5 (the first
+# special edition, archived in v5/): its score takes stay local except the chosen one (s3, as FLAC); its mixes and stems
+# are rebuilt by v5/tools/mix.py from the cue sheet and the effects library
+projects/almostfriends-special/v5/audio/music/*.wav
+projects/almostfriends-special/v5/audio/mix*.wav
+projects/almostfriends-special/v5/audio/stem-*.wav

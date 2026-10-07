@@ -1,0 +1,7 @@
+{
+ "name": "scan",
+ "prompt": "Soft airy sonar sweep pulse expanding outward, warm and futuristic, whooshy, no beep, no melody",
+ "seconds": 1.5,
+ "prompt_influence": 0.5,
+ "credits": "15"
+}
