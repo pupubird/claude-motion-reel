@@ -23,7 +23,13 @@
     "fy:render": "node projects/feiyuehui/v4/render.mjs",
     "fy:audio": "python3 projects/feiyuehui/v4/tools/sfx.py && python3 projects/feiyuehui/v4/tools/mix.py --score c6",
     "fy:check": "python3 projects/feiyuehui/v4/tools/check_frames.py projects/feiyuehui/v4/out/feiyuehui-v4.mp4 && python3 projects/feiyuehui/v4/tools/check_audio.py projects/feiyuehui/v4/out/feiyuehui-v4.mp4",
-    "fy:real": "python3 projects/feiyuehui/v4/tools/v2v_comp.py --selftest && python3 projects/feiyuehui/v4/tools/v2v_edit.py projects/feiyuehui/v4/tools/real_edit.json projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_frames.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_audio.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4"
+    "fy:real": "python3 projects/feiyuehui/v4/tools/v2v_comp.py --selftest && python3 projects/feiyuehui/v4/tools/v2v_edit.py projects/feiyuehui/v4/tools/real_edit.json projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_frames.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4 && python3 projects/feiyuehui/v4/tools/check_audio.py projects/feiyuehui/v4/out/feiyuehui-v4-real.mp4",
+    "af:stills": "node projects/almostfriends/render.mjs --samples=8 --stills=0,0.9s,2.9s,9.7s,17.3s,32.3s,49.5s,51.9s,61s,64.5s",
+    "af:audio": "node projects/almostfriends/tools/cues.mjs > projects/almostfriends/audio/cues.json && python3 projects/almostfriends/tools/foley.py && python3 projects/almostfriends/tools/mix.py --score v6a-s --swell 1.4,2.0 --breath 48 --tp -2",
+    "af:render": "node projects/almostfriends/render.mjs --samples=16 --workers=3 --crf=14 --wav=projects/almostfriends/audio/mix.wav --out=projects/almostfriends/out/almostfriends-reel-2026.mp4",
+    "af:render4k": "node projects/almostfriends/render.mjs --samples=16 --workers=3 --scale=2 --crf=16 --wav=projects/almostfriends/audio/mix.wav --out=projects/almostfriends/out/almostfriends-reel-2026-4k.mp4",
+    "af:check": "python3 projects/almostfriends/tools/check_frames.py projects/almostfriends/out/almostfriends-reel-2026.mp4 && python3 projects/almostfriends/tools/check_jumps.py projects/almostfriends/out/almostfriends-reel-2026.mp4 --allow=0.5",
+    "af:read": "node projects/almostfriends/tools/check_reading.mjs"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +37,7 @@
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/cormorant-garamond": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/inter-tight": "^5.3.0",

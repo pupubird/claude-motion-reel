@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Product film 2026 (vertical)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; }
+  body { display: grid; place-items: center; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; color: #eee; }
+  canvas#out { display: block; height: min(100vh, 177.78vw); width: auto; aspect-ratio: 9 / 16; }
+  body.render canvas#out { width: var(--pw); height: var(--ph); }
+  #hint { position: fixed; bottom: 24px; left: 0; right: 0; text-align: center; opacity: .7; letter-spacing: .12em; }
+  body.render #hint { display: none; }
+</style>
+<!-- Served from the repo root so node_modules is shared with the other reels. -->
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="out"></canvas>
+<div id="hint">CLICK TO PLAY · SPACE TO PAUSE · ←/→ STEP</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

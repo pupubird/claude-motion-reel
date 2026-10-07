@@ -42,3 +42,16 @@ projects/feiyuehui/v4/audio/music/*
 !projects/feiyuehui/v4/audio/music/c6.json
 projects/feiyuehui/v4/audio/**/*.log
 projects/feiyuehui/v4/lookdev/
+
+# almost friends (reel 06): third-party UI reference screenshots (Mobbin captures, private reference), the full-size
+# portrait downloads and look-dev tests, the earlier casts (v1–v5), the score takes and generated stems (tools/music.py,
+# foley.py and mix.py rebuild them; each take's song id is in audio/music/<take>.json; the released score is committed
+# as audio/music/v6a-s.mp3), and the review pages with the animatic of every iteration. The release holds the film.
+projects/almostfriends/research/ui-refs/
+projects/almostfriends/assets/people/raw/
+projects/almostfriends/assets/people/tests/
+projects/almostfriends/assets/people/v4/
+projects/almostfriends/audio/*.wav
+projects/almostfriends/audio/music/*.wav
+projects/almostfriends/audio/music/*.log
+projects/almostfriends/docs/storyboard/

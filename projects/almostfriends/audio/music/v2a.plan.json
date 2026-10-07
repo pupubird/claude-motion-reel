@@ -1,0 +1,149 @@
+{
+ "chunks": [
+  {
+   "text": "[Intro]\n{a filtered, muffled groove, as if heard through a phone speaker in the next room}\n{light curious plucks on each beat}\n{the filter stays closed; the full band is held back}",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "instrumental",
+    "sunlit disco-funk",
+    "modern nu-disco production",
+    "120 BPM",
+    "4/4",
+    "A major",
+    "tight four-on-the-floor kick",
+    "crisp off-beat open hi-hats and tambourine sixteenths",
+    "fingered electric bass with octave runs",
+    "Rhodes electric piano",
+    "clean muted funk guitar chops",
+    "bright marimba and vibraphone hook",
+    "lush disco strings",
+    "warm analog tape saturation",
+    "playful, confident, warm",
+    "low-pass filtered intro",
+    "great production quality"
+   ],
+   "negative_styles": [
+    "vocals",
+    "singing",
+    "lyrics",
+    "spoken word",
+    "choir",
+    "vocal chops",
+    "ukulele",
+    "whistling",
+    "glockenspiel",
+    "corporate stock music",
+    "cheesy",
+    "children's cartoon",
+    "romantic ballad",
+    "sultry saxophone",
+    "EDM supersaw drop",
+    "dubstep",
+    "trap hi-hats",
+    "lo-fi hiss",
+    "key change"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": {
+    "song_id": "BkWoAzuLDmwMkKmVuff6",
+    "range": {
+     "start_ms": 6000,
+     "end_ms": 36000
+    }
+   },
+   "condition_strength": "high"
+  },
+  {
+   "text": "[Hook]\n{the full band drops in on beat one with a big downbeat hit}\n{a catchy, bouncy marimba and vibraphone hook over the groove}",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "instrumental",
+    "120 BPM",
+    "A major",
+    "sunlit disco-funk",
+    "filter fully open",
+    "big downbeat on beat one",
+    "punchy and bright",
+    "catchy mallet hook"
+   ],
+   "negative_styles": [
+    "vocals",
+    "lyrics",
+    "fade in",
+    "quiet start",
+    "muffled"
+   ],
+   "context_adherence": "low"
+  },
+  {
+   "text": "[Verse]\n{the groove thins out: kick, bass, soft Rhodes chords and muted guitar}\n{leave space in the upper mids}",
+   "duration_ms": 8000,
+   "positive_styles": [
+    "instrumental",
+    "120 BPM",
+    "A major",
+    "sunlit disco-funk",
+    "lighter groove",
+    "sparse and bouncy",
+    "room for sound effects",
+    "curious and friendly"
+   ],
+   "negative_styles": [
+    "vocals",
+    "lyrics",
+    "busy lead melody",
+    "loud strings"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "text": "[Verse 2]\n{snappy claps join on two and four, a rising string swell, string stabs answer the hook}",
+   "duration_ms": 10000,
+   "positive_styles": [
+    "instrumental",
+    "120 BPM",
+    "A major",
+    "sunlit disco-funk",
+    "building energy",
+    "disco string stabs",
+    "snare and clap backbeat",
+    "optimistic"
+   ],
+   "negative_styles": [
+    "vocals",
+    "lyrics",
+    "breakdown",
+    "silence"
+   ],
+   "context_adherence": "medium"
+  },
+  {
+   "text": "[Call and Response]\n{two lead instruments trade one-bar phrases: muted funk guitar asks, marimba answers}\n{playful conversation between the two, steady groove underneath, the strings lift for the last bars}",
+   "duration_ms": 14000,
+   "positive_styles": [
+    "instrumental",
+    "120 BPM",
+    "A major",
+    "sunlit disco-funk",
+    "call and response",
+    "muted funk guitar phrases",
+    "marimba answers",
+    "playful and cheeky"
+   ],
+   "negative_styles": [
+    "vocals",
+    "lyrics",
+    "loud strings",
+    "breakdown"
+   ],
+   "context_adherence": "high"
+  },
+  {
+   "song_id": "BkWoAzuLDmwMkKmVuff6",
+   "range": {
+    "start_ms": 38000,
+    "end_ms": 62000
+   }
+  }
+ ]
+}

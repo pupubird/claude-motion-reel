@@ -1,0 +1,226 @@
+{
+ "name": "t1",
+ "model": "music_v2_5",
+ "seed": 101,
+ "song_id": "BkWoAzuLDmwMkKmVuff6",
+ "format": "pcm_48000",
+ "plan": {
+  "chunks": [
+   {
+    "text": "[Intro]\n{a filtered, muffled groove, as if heard through a phone speaker in the next room}\n{a single marimba note repeats on the beat, the same note every time}\n{the filter stays closed; the full band is held back}",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "sunlit disco-funk",
+     "modern nu-disco production",
+     "120 BPM",
+     "4/4",
+     "A minor",
+     "tight four-on-the-floor kick",
+     "crisp off-beat open hi-hats and tambourine sixteenths",
+     "fingered electric bass with octave runs",
+     "Rhodes electric piano",
+     "clean muted funk guitar chops",
+     "bright marimba and vibraphone hook",
+     "lush disco strings",
+     "warm analog tape saturation",
+     "playful, confident, warm",
+     "low-pass filtered intro",
+     "great production quality"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "spoken word",
+     "choir",
+     "vocal chops",
+     "ukulele",
+     "whistling",
+     "glockenspiel",
+     "corporate stock music",
+     "cheesy",
+     "children's cartoon",
+     "romantic ballad",
+     "sultry saxophone",
+     "EDM supersaw drop",
+     "dubstep",
+     "trap hi-hats",
+     "lo-fi hiss",
+     "key change"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Hook]\n{the full band drops in on beat one with a big downbeat hit}\n{a catchy, bouncy marimba and vibraphone hook over the groove}",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "filter fully open",
+     "big downbeat on beat one",
+     "punchy and bright",
+     "catchy mallet hook",
+     "driving four-on-the-floor groove"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "fade in",
+     "quiet start",
+     "muffled"
+    ],
+    "context_adherence": "low"
+   },
+   {
+    "text": "[Verse]\n{the groove thins out: kick, bass, soft Rhodes chords and muted guitar}\n{leave space in the upper mids}",
+    "duration_ms": 8000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "lighter groove",
+     "sparse and bouncy",
+     "room for sound effects",
+     "curious and friendly"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "busy lead melody",
+     "loud strings"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Verse 2]\n{snappy claps join on two and four, string stabs answer the hook}",
+    "duration_ms": 8000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "building energy",
+     "disco string stabs",
+     "snare and clap backbeat",
+     "optimistic"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "breakdown",
+     "silence"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "[Call and Response]\n{two lead instruments trade one-bar phrases: muted funk guitar asks, marimba answers}\n{playful conversation between the two, steady groove underneath, the strings lift for the last bars}",
+    "duration_ms": 12000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "call and response",
+     "muted funk guitar phrases",
+     "marimba answers",
+     "playful and cheeky",
+     "steady groove"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "loud strings",
+     "breakdown"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "[Build]\n{guitar and marimba come together in unison, a snare roll and filter sweep climb for three bars}\n{then for the final bar the whole band stops: just a soft reversed swell, no drums, no bass}",
+    "duration_ms": 8000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "rising build",
+     "accelerating snare roll",
+     "filter sweep opening",
+     "tension and anticipation",
+     "sudden stop before the drop"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "EDM supersaw",
+     "dubstep"
+    ],
+    "context_adherence": "high"
+   },
+   {
+    "text": "[Drop]\n{massive hit on beat one: the full band returns, brighter and bigger than before}\n{octave bass, soaring disco strings, mallet hook in octaves}",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "massive downbeat hit",
+     "euphoric",
+     "C major lift",
+     "soaring disco strings",
+     "full band at maximum energy",
+     "joyful"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "fade in",
+     "quiet start",
+     "build",
+     "key change"
+    ],
+    "context_adherence": "low"
+   },
+   {
+    "text": "[Chorus]\n{the band hits on beat one and stops for two beats, then the groove kicks straight back in}",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "stop-time break",
+     "full groove",
+     "confident",
+     "warm and joyful"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "breakdown",
+     "key change"
+    ],
+    "context_adherence": "medium"
+   },
+   {
+    "text": "[Outro]\n{one final full-band hit on beat one, then a ringing major chord with a mallet sparkle that decays to silence}",
+    "duration_ms": 4000,
+    "positive_styles": [
+     "instrumental",
+     "120 BPM",
+     "sunlit disco-funk",
+     "final hit on beat one",
+     "ringing chord",
+     "mallet sparkle",
+     "decays to silence by the end"
+    ],
+    "negative_styles": [
+     "vocals",
+     "lyrics",
+     "new groove",
+     "drum loop",
+     "fade in",
+     "abrupt cut"
+    ],
+    "context_adherence": "medium"
+   }
+  ]
+ }
+}

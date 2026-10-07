@@ -1,0 +1,82 @@
+{
+ "name": "v3c",
+ "model": "music_v2_5",
+ "seed": 403,
+ "song_id": "G8VP4egnJuBskPSjAy26",
+ "format": "pcm_48000",
+ "plan": {
+  "chunks": [
+   {
+    "text": "[Intro]\n{bar one: a quick snare and tom fill as a pickup}\n{bar two, beat one: a huge full-band hit and the groove kicks in at full volume, no stop after the hit}\n{dense and driving: four-on-the-floor kick, claps on two and four, octave bass, disco string stabs, a plucky marimba hook}\n{keep the full band playing through the last beat, with a snare roll building into the next downbeat}",
+    "duration_ms": 6000,
+    "positive_styles": [
+     "instrumental",
+     "sunlit disco-funk",
+     "modern nu-disco production",
+     "120 BPM",
+     "4/4",
+     "A major",
+     "drum fill pickup into a huge downbeat hit",
+     "loud and dense from the first downbeat",
+     "maximum energy",
+     "continuous groove with no breaks",
+     "tight four-on-the-floor kick",
+     "claps on two and four",
+     "fingered electric bass with octave runs",
+     "disco string stabs",
+     "bright marimba and vibraphone hook",
+     "great production quality"
+    ],
+    "negative_styles": [
+     "vocals",
+     "singing",
+     "lyrics",
+     "spoken word",
+     "choir",
+     "vocal chops",
+     "ukulele",
+     "whistling",
+     "glockenspiel",
+     "corporate stock music",
+     "cheesy",
+     "children's cartoon",
+     "romantic ballad",
+     "sultry saxophone",
+     "EDM supersaw drop",
+     "dubstep",
+     "trap hi-hats",
+     "lo-fi hiss",
+     "key change",
+     "filtered intro",
+     "muffled",
+     "low-pass filter",
+     "quiet start",
+     "fade in",
+     "slow build",
+     "ambient pad intro",
+     "sparse arrangement",
+     "stop-time break",
+     "pause after the hit",
+     "breakdown",
+     "drop-out"
+    ],
+    "context_adherence": "high",
+    "conditioning_ref": {
+     "song_id": "HriMgOtUVR0RxCuWUau2",
+     "range": {
+      "start_ms": 6000,
+      "end_ms": 36000
+     }
+    },
+    "condition_strength": "high"
+   },
+   {
+    "song_id": "HriMgOtUVR0RxCuWUau2",
+    "range": {
+     "start_ms": 6000,
+     "end_ms": 68000
+    }
+   }
+  ]
+ }
+}
