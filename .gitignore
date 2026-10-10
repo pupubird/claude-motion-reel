@@ -62,3 +62,13 @@ projects/almostfriends/docs/storyboard/
 projects/almostfriends-special/v5/audio/music/*.wav
 projects/almostfriends-special/v5/audio/mix*.wav
 projects/almostfriends-special/v5/audio/stem-*.wav
+
+# almost friends — the Apple way (reel 06 rebuilt in Blender). The skies are CC0 Poly Haven HDRIs that
+# film/tools/fetch_hdris.py fetches (only their names and measured suns are kept); film.blend is built by
+# film/build_film.py; the music edit, effects and mix are rebuilt from the Suno stems by film/tools/music_film.py and
+# sfx_film.py. The release holds the film.
+projects/almostfriends-apple/assets/hdri/*.hdr
+projects/almostfriends-apple/film/film.blend
+projects/almostfriends-apple/audio/edits/
+*.blend1
+__pycache__/

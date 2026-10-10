@@ -2,7 +2,7 @@
 
 Motion-design films where every frame is rendered by code (three.js, Canvas 2D, hand-written GLSL) and
 every sound effect is synthesised by code (Web Audio), captured frame-exactly with headless Chrome. Reels 01–03
-synthesise their scores too; reel 04 pairs a score composed with ElevenLabs Music to the same measured beat grid. Reel 05 adds one generative step: its code render is rendered again as grey clay and re-rendered photoreal by Seedance 2.5 against the client's product photographs, and every title and the logo go back on from the code render. Reel 06 is vertical (9:16): a product film with a soap-film shader, a 3D character and an AI-generated cast of 32 fictional people, scored with ElevenLabs Music cut to the bar grid, released in English and in Chinese (中文版) from the same code. Designed and built by Claude (Anthropic's model) in [Claude Code](https://claude.com/claude-code) sessions.
+synthesise their scores too; reel 04 pairs a score composed with ElevenLabs Music to the same measured beat grid. Reel 05 adds one generative step: its code render is rendered again as grey clay and re-rendered photoreal by Seedance 2.5 against the client's product photographs, and every title and the logo go back on from the code render. Reel 06 is vertical (9:16): a product film with a soap-film shader, a 3D character and an AI-generated cast of 32 fictional people, scored with ElevenLabs Music cut to the bar grid, released in English and in Chinese (中文版) from the same code. Its third edition, the Apple way, leaves the browser: it is path-traced in Blender Cycles from Python, with photographic CC0 skies over a sea built in nodes, frosted glass people, every word set by Chrome and animated glyph by glyph, and a Suno score cut on its own MIDI. Designed and built by Claude (Anthropic's model) in [Claude Code](https://claude.com/claude-code) sessions.
 
 https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 
@@ -15,6 +15,7 @@ https://github.com/user-attachments/assets/b7a81968-4e57-4007-8f57-6759430e55c2
 | [05 · 翡月荟](projects/feiyuehui/) | 40 s | Brand film for a jadeite house, released photoreal: a three.js film (the ring rising over a sea of cloud like the moon, a vortex of 100 cabochons, 设计 · 雕刻 描金 · 镶嵌, the collection orbiting the sunrise, a gold phoenix lockup), rendered again as clay and re-rendered by Seedance 2.5 from the client's own product photos; every title is the code render's own pixels | [![](projects/feiyuehui/v4/docs/poster.jpg)](projects/feiyuehui/) |
 | [06 · almost friends](projects/almostfriends/) | 66 s, 9:16, English + 中文 | Product film for a friend-making app: a bubble character knocks on the wall of your bubble ("How to make more friends") until it pops on the drop; the app shown in a real phone; a 3D flight through a universe of people; an anonymous chat; a two-key unlock in silence; a circle of friends with room to breathe | [![](projects/almostfriends/docs/poster.jpg)](projects/almostfriends/) |
 | [06 · almost friends — special edition](projects/almostfriends-special/) | 66 s, 9:16, English + 中文 | The released cut, frame for frame — the same words, score and tempo — with every bubble that carries the story re-made in a raymarched liquid engine: your orb tears as the camera dives through it, a gold glass ring locks on the one, two people's bubbles kiss and share a real wall, SAME!! bursts out as blue jelly, each face bursts out of its own film, and the mark is a glossy liquid double bubble. The phone is a real 3D device under a camera that never rests, and every line of type stands inside its shot — written on the bubble's wall, beside the turned phone, in the universe's crowd, among the friends — never on top of it | [![](projects/almostfriends-special/docs/poster.jpg)](projects/almostfriends-special/) |
+| [06 · almost friends — the Apple way](projects/almostfriends-apple/) | 53.6 s, 9:16 | Rebuilt from scratch and path-traced in Blender: the hook clears from a fogged pane and the camera dives through it into a sunlit sea of glass strangers; you choose what matters on a dial and each choice fills your ring with its colour; the search runs through a sky of people to a match on the brass hit; three anonymous days in time-lapse; two yeses and a held breath; the sun breaks out, the frost bursts and the faces appear; the two rings become the mark | [![](projects/almostfriends-apple/docs/poster.jpg)](projects/almostfriends-apple/) |
 
 Each reel has a `README.md` (what you're watching, how to run it) and a `LEARNING.md` (workflow,
 decisions, every bug with root cause and prevention, measured quality gates). The rules all of them share — the
@@ -38,6 +39,7 @@ npm run af:audio && npm run af:render && npm run af:check && npm run af:read   #
 npm run af:audio:zh && npm run af:render:zh && npm run af:check:zh && npm run af:read:zh   # reel 06, the Chinese cut
 npm run afs:render && npm run afs:check && npm run afs:read   # reel 06, the special edition (plays the released mix; afs:render4k for 4K)
 npm run afs:render:zh && npm run afs:check:zh && npm run afs:read:zh   # reel 06 special, the Chinese cut (the released Chinese mix)
+# reel 06, the Apple way: Blender 5.2+ and Python, see projects/almostfriends-apple/README.md (skies, score, build, render, gates)
 ```
 
 Renders are deterministic: seeded randomness, and each frame is a pure function of time.
@@ -50,6 +52,6 @@ included — the prep script copies them from a licensed local checkout. Reel 05
 to 翡月荟 and are used with the client's consent; they, and everything built from them (the 3D asset package, the logo
 traces, the Seedance takes), stay local. The repo holds the film's code; the release holds the finished film.
 Reel 06's people are AI-generated and fictional (GPT Image 2 on Higgsfield); its score was composed with ElevenLabs
-Music; the third-party app screenshots used as UI research references are not included.
+Music; the third-party app screenshots used as UI research references are not included. Its Apple-way edition fetches its skies (CC0 HDRIs from Poly Haven) instead of storing them; its score is the owner's Suno song "Sunny Groove", kept as stems and MIDI; the frames of the third-party reference films it studied are not included.
 
 *Not an official Anthropic project.*

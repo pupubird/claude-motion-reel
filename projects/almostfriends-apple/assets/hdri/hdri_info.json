@@ -1,0 +1,57 @@
+{
+ "kloofendal_48d_partly_cloudy_puresky": {
+  "sun_az_deg": 124.3,
+  "sun_el_deg": 47.9,
+  "mean_sky": 1.1585
+ },
+ "kloofendal_overcast_puresky": {
+  "sun_az_deg": 123.0,
+  "sun_el_deg": 22.6,
+  "mean_sky": 1.2233
+ },
+ "qwantani_dawn_puresky": {
+  "sun_az_deg": 125.0,
+  "sun_el_deg": 8.8,
+  "mean_sky": 1.41
+ },
+ "qwantani_dusk_2_puresky": {
+  "sun_az_deg": 126.1,
+  "sun_el_deg": 11.4,
+  "mean_sky": 1.2461
+ },
+ "qwantani_late_afternoon_puresky": {
+  "sun_az_deg": 126.1,
+  "sun_el_deg": 19.1,
+  "mean_sky": 1.7842
+ },
+ "qwantani_mid_morning_puresky": {
+  "sun_az_deg": 126.1,
+  "sun_el_deg": 40.1,
+  "mean_sky": 1.5701
+ },
+ "qwantani_morning_puresky": {
+  "sun_az_deg": 126.1,
+  "sun_el_deg": 20.2,
+  "mean_sky": 1.7772
+ },
+ "qwantani_night_puresky": {
+  "sun_az_deg": 134.0,
+  "sun_el_deg": 11.6,
+  "mean_sky": 0.8901
+ },
+ "qwantani_sunrise_puresky": {
+  "sun_az_deg": 126.0,
+  "sun_el_deg": 2.6,
+  "mean_sky": 1.4128
+ },
+ "qwantani_sunset_puresky": {
+  "sun_az_deg": 126.0,
+  "sun_el_deg": 6.1,
+  "mean_sky": 1.6049
+ },
+ "sunflowers_puresky": {
+  "sun_az_deg": 126.2,
+  "sun_el_deg": 43.0,
+  "mean_sky": 1.1635
+ }
+}

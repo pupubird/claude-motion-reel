@@ -1,0 +1,114 @@
+{
+ "pill_family": {
+  "text": "Family",
+  "wM": 0.11440885416666667,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "pill_career": {
+  "text": "Career",
+  "wM": 0.11783072916666666,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "pill_health": {
+  "text": "Health",
+  "wM": 0.114359375,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "pill_adventure": {
+  "text": "Adventure",
+  "wM": 0.172046875,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "pill_learning": {
+  "text": "Learning",
+  "wM": 0.1469140625,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "pill_money": {
+  "text": "Money",
+  "wM": 0.11930729166666666,
+  "hM": 0.053036458333333335,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 1
+ },
+ "day1": {
+  "text": "Day 1",
+  "wM": 0.1386171875,
+  "hM": 0.078,
+  "px": 6000,
+  "colour": "#ffffff",
+  "lines": 1
+ },
+ "day2": {
+  "text": "Day 2",
+  "wM": 0.14889583333333334,
+  "hM": 0.078,
+  "px": 6000,
+  "colour": "#ffffff",
+  "lines": 1
+ },
+ "day3": {
+  "text": "Day 3",
+  "wM": 0.15023697916666667,
+  "hM": 0.078,
+  "px": 6000,
+  "colour": "#ffffff",
+  "lines": 1
+ },
+ "msg1": {
+  "text": "Sunday lunch with my\nfamily is sacred.",
+  "wM": 0.3341692708333333,
+  "hM": 0.09519791666666666,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 2
+ },
+ "msg2": {
+  "text": "Same. Mine starts\nwith a long walk.",
+  "wM": 0.27631510416666666,
+  "hM": 0.09519791666666666,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 2
+ },
+ "msg3": {
+  "text": "Feels like I\u2019ve known\nyou for years.",
+  "wM": 0.3086015625,
+  "hM": 0.09519791666666666,
+  "px": 6000,
+  "colour": "#1d1d1f",
+  "lines": 2
+ },
+ "sofia": {
+  "text": "Sofia, 28",
+  "wM": 0.17998697916666667,
+  "hM": 0.06551822916666666,
+  "px": 6000,
+  "colour": "#ffffff",
+  "lines": 1
+ },
+ "hana": {
+  "text": "Hana, 26",
+  "wM": 0.18259114583333333,
+  "hM": 0.06551822916666666,
+  "px": 6000,
+  "colour": "#ffffff",
+  "lines": 1
+ }
+}

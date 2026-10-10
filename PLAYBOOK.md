@@ -2,7 +2,7 @@
 
 The working rules behind every reel in this repo, distilled from the owner's notes on reels 01–06 and from each reel's
 `LEARNING.md` (which holds the reel-specific detail: versions, decisions, every bug with its root cause and
-prevention). Each rule was learned from a cut that broke it; the reel that taught it is in brackets.
+prevention). Each rule was learned from a cut that broke it; the reel that taught it is in brackets. [06A] is reel 06's Apple-way edition (`projects/almostfriends-apple`).
 
 ## The bar
 
@@ -12,6 +12,7 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 - Every scene is designed, not assembled: "highest possible design taste… genuine AAA quality, not generic 3D AI
   slop". [05]
 - Something worth watching every few seconds. A film may run past 60 s if every beat earns it. [06]
+- Energy has a shape, measured: a new picture at least every 1.5–2 s, peaks well above the median and one deliberate breath ("linear all the way" was the note). `energy.py` lists every stretch over 2 s without a new picture; check it against the reference cuts before anyone watches. [06A]
 
 ## Openings
 
@@ -36,6 +37,8 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
   1.0–1.7× that while the motion keeps going. [04] The rule is a guide, not a gate: a known line, a short label or a
   phrase completing one on screen can be quicker, and a film is never slowed just to satisfy the number. [05]
 - A word that has fully formed holds long enough to land (~1.5 s at a scene's key line). [05]
+- Type moves like the film: every line is set once with real kerning and cut into one plane per glyph, so letters or words fly, slam or rise in and whip or scatter out ("no handling in motion" was the note on static type). Accent colour is checked against what is behind it (an orange SAME!! vanished on an amber bubble). [06A]
+- A title placed in a moving 3D world drifts out of frame: place titles on the final camera (a screen spot at a reference frame, square to the lens) and let them ride it only partly, so they still breathe. [06A]
 - Type lives in the scene (occluded, lit, refracted, carved, revealed by light), never slapped on top. Effects on type
   settle before the read; type is tinted with a solid colour, never alpha. [05, 06]
 - Light and shadow do not integrate type that still sits in a band: place each line by its subject, not by the frame —
@@ -49,6 +52,7 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 
 - Energetic motion: leave fast, land soft, bouncy springs, hits with a flash and a shake; slow-in/slow-out reads
   floaty. [06]
+- Decoration on every hit reads cheesy: hard cuts to unmotivated angles, a shake on each beat, sparks, comets and shatters around a simple choice ("a bit cheesy … maybe is camera issue"). The WOW is the meaningful move: a dial that turns, a ring that fills with the choice's colour, a camera that circles; keep flash and shake for the one or two moments that earn them. [06A]
 - Short shots with one deliberate breath. The breath that worked: a slow push onto what everyone is waiting for, in
   near-silence, a character holding its breath. [02, 06]
 - Something carries across every act boundary (a point of light, a title bar, a line, an object). No hard cuts; never
@@ -136,6 +140,8 @@ prevention). Each rule was learned from a cut that broke it; the reel that taugh
 - A failed render must not leave gigabytes of intermediates behind; clean up with `find … -delete`, not a bare glob.
 - Secrets live in git-ignored `.env` files and are never printed; test for a key with `grep -q`, never `grep -c`.
 - Shared GPU state has one source of truth.
+- Path-traced type and light have their own traps: transparent glyph planes at one depth drop slices; dozens of invisible planes on a ray exhaust the transparent bounces and hide later type (hide what is not on screen); an emission-only surface keyed down to 0 turns black (add emission over transparent); floating objects cast dark blots on water (turn their shadows off); measure each sky's sun rather than assume the equirect convention. [06A]
+- One camera path for the whole film, smoothed as one and wider where acts meet, with the worst linear and angular acceleration printed by every build; per-act cameras hand their last state to the next. [06A]
 - Words live in one table per cut, with the same shape checked at load. Before a new cut is judged, prove the
   original unchanged: a pixel diff against a second render of the same code (run-to-run noise is real), and its cue
   sheet byte-identical. [06]
